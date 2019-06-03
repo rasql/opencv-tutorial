@@ -3,9 +3,8 @@
 # import the necessary packages
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image
-from PIL import ImageTk
-import cv2
+from PIL import Image, ImageTk
+import cv2 as cv
 
 def select_image():
 	# grab a reference to the image panels
@@ -19,13 +18,13 @@ def select_image():
 	if len(path) > 0:
 		# load the image from disk, convert it to grayscale, and detect
 		# edges in it
-		image = cv2.imread(path)
-		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		edged = cv2.Canny(gray, 50, 100)
+		image = cv.imread(path)
+		gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+		edged = cv.Canny(gray, 50, 100)
 
 		# OpenCV represents images in BGR order; however PIL represents
 		# images in RGB order, so we need to swap the channels
-		image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+		image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
 
 		# convert the images to PIL format...
 		image = Image.fromarray(image)

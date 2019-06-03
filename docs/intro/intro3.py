@@ -1,9 +1,8 @@
 """Capture video from camera."""
+from cvlib import *
 
-import numpy as np
-import cv2
-
-cap = cv2.VideoCapture(0)
+# print capture attributes
+cap = cv.VideoCapture(0)
 for i in range(18):
     print(i, cap.get(i))
 
@@ -12,13 +11,13 @@ while(True):
     ret, frame = cap.read()
 
     # Our operations on the frame come here
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
     # Display the resulting frame
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    cv.imshow('frame', frame)
+    if cv.waitKey(1) & 0xFF == ord('q'):
         break
 
 # When everything done, release the capture
 cap.release()
-cv2.destroyAllWindows()
+cv.destroyAllWindows()
