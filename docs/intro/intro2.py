@@ -1,10 +1,20 @@
-"""Open an image and display it with Matplotlib."""
-from cvlib import *
+"""Capture video from camera."""
+import cv2 as cv
 
-# Load an color image in grayscale
-# img = cv.imread('messi.jpg',cv.IMREAD_GRAYSCALE)
-img = cv.imread('messi.jpg', cv.IMREAD_COLOR)
+cap = cv.VideoCapture(0)
 
-plt.imshow(img, cmap = 'gray', interpolation = 'bicubic')
-plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-plt.show()
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+
+    # Our operations on the frame come here
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+    # Display the resulting frame
+    cv.imshow('frame', frame)
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# When everything done, release the capture
+cap.release()
+cv.destroyAllWindows()

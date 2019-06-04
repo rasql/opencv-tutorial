@@ -1,23 +1,23 @@
-"""Capture video from camera."""
-from cvlib import *
+"""Catch mouse events and write to overlay and statusbar."""
+import cv2 as cv
 
-# print capture attributes
-cap = cv.VideoCapture(0)
-for i in range(18):
-    print(i, cap.get(i))
+def trackbar(x):
+    """Trackbar callback function."""
+    text = 'Trackbar: {}'.format(x)
+    cv.displayOverlay('image', text, 1000)
+    cv.imshow('image', img)
 
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+def mouse(event, x, y, flags, param):
+    """Mouse callback function."""
+    text = 'mouse at ({}, {})'.format(x, y)
+    cv.displayOverlay('image', 'Overlay: ' + text, 1000)
+    cv.displayStatusBar('image', 'Statusbar: ' + text, 1000)
 
-    # Our operations on the frame come here
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+img = cv.imread('messi.jpg', cv.IMREAD_COLOR)
+cv.imshow('image', img)
 
-    # Display the resulting frame
-    cv.imshow('frame', frame)
-    if cv.waitKey(1) & 0xFF == ord('q'):
-        break
+cv.setMouseCallback('image', mouse)
+cv.createTrackbar('x', 'image', 100, 255, trackbar)
 
-# When everything done, release the capture
-cap.release()
+cv.waitKey(0)
 cv.destroyAllWindows()

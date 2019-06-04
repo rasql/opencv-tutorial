@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OpenCV tutorial's documentation!
-===========================================
+Welcome to the OpenCV tutorial
+==============================
 
 .. toctree::
    :maxdepth: 2
