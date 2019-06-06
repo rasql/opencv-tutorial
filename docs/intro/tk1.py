@@ -10,7 +10,7 @@ def select_image():
 	# grab a reference to the image panels
 	global panelA, panelB
 
-	# open a file chooser dialog and allow the user to select an input
+	# open a file chooser dialog and allow the user to draw_selection an input
 	# image
 	path = filedialog.askopenfilename()
 
@@ -60,7 +60,7 @@ panelA = None
 panelB = None
 
 # create a button, then when pressed, will trigger a file chooser
-# dialog and allow the user to select an input image; then add the
+# dialog and allow the user to draw_selection an input image; then add the
 # button the GUI
 btn = Button(root, text="Select an image", command=select_image)
 btn.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
