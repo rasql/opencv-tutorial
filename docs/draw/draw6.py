@@ -1,4 +1,4 @@
-"""Add optional parameters to ellipse."""
+"""Display a polygon object."""
 from cvlib import *
 
 class Demo(App):
@@ -7,11 +7,13 @@ class Demo(App):
         img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
 
         win = Window('window', img)
-        
-        Ellipse((200, 100), (200, 100), CYAN, 2)
-        Ellipse((200, 200), (200, 100), BLUE, 2, a0=45)
-        Ellipse((200, 300), (200, 100), RED, -1, a0=-45, a1=45, a2=270)
 
+        Text('hello', (0, 100))
+        Text('world', (20, 200), fontScale=4, thickness=4)
+        
+        pts = np.array([[200, 100], [100, 350], [500, 400]])
+        Polygon(pts, color=YELLOW, thickness=5, isClosed=True)
+       
         win.draw()
 
 if __name__ == '__main__':

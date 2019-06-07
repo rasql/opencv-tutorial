@@ -9,18 +9,17 @@ class Demo(App):
         img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
 
         win = Window('window', img)
-        Rectangle((20, 20), (100, 100), YELLOW, -1)
-        Ellipse((200, 120), (100, 60), CYAN, -1)
-        Line((20, 20), (200, 100), BLUE, 5)
-        Line((330, 20), (550, 190), GREEN, 5)
-        Circle((130, 220), 100, GREEN, 5)
+        Arrow((50, 50), (250, 50))
+        Line((50, 100), (250, 150), thickness=3)
+        Marker((50, 150))
+        Marker((100, 150), markerType=cv.MARKER_DIAMOND, thickness=2)
         
-        Text('hello', (220, 220), GREEN)
-        Text('OpenCV', (220, 320), RED, 3)
+        Rectangle((50, 200), (250, 250), thickness=-1)
+        Rectangle((50, 200), (250, 250), thickness=3, color=YELLOW)
         
-        pts = np.array([[10,5],[220,30],[70,320],[350,310]], np.int32)
-        Polygon(pts, RED, 2)
-
+        Circle((100, 250), 50, thickness=-1)
+        Circle((100, 250), 50, thickness=5, color=RED)
+        
         win.draw()
 
 if __name__ == '__main__':

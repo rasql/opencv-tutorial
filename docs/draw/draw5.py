@@ -1,4 +1,4 @@
-"""Add optional parameters to graphics objects."""
+"""Display Text objects."""
 from cvlib import *
 
 class Demo(App):
@@ -8,11 +8,10 @@ class Demo(App):
 
         win = Window('window', img)
         
-        Text('OpenCV', (0, 100), GREEN, 1)
-        t = Text('OpenCV', (100, 100), RED, 2)
-        Text('OpenCV', (300, 100), BLUE, 3)
-
-        t.set_text('CV')
+        Text('OpenCV', (0, 100))
+        Text('OpenCV', (0, 200), color=GREEN)
+        Text('OpenCV', (0, 300), fontScale=2, thickness=2)
+        
         win.draw()
 
 if __name__ == '__main__':

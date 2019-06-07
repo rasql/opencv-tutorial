@@ -1,28 +1,31 @@
-"""Mark objects as active by mouse-click. Delete with backspace."""
-
+"""Display different markers."""
 from cvlib import *
 
-L = ['Rectangle', 'Line', 'Ellipse', 'Polygon', 'Circle', 'Text']
+markers = ( cv.MARKER_CROSS,
+            cv.MARKER_DIAMOND,
+            cv.MARKER_SQUARE,
+            cv.MARKER_STAR,
+            cv.MARKER_TILTED_CROSS,
+            cv.MARKER_TRIANGLE_DOWN,
+            cv.MARKER_TRIANGLE_UP)
 
 class Demo(App):
     def __init__(self):
         super(Demo, self).__init__()
-        img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
+    
+        Window('window')
 
-        win = Window('window', img)
-        win.objects.append(Rectangle(img, (20, 20), (100, 100), YELLOW, -1))
-        win.objects.append(Ellipse(img, (200, 120), (300, 240), CYAN, -1))
-        win.objects.append(Line(img, (20, 20), (200, 100), BLUE, 5))
-        win.objects.append(Line(img, (330, 20), (550, 190), GREEN, 5))
-        win.objects.append(Circle(img, (130, 220), 100, GREEN, 5))
-        
-        win.objects.append(Text(img, 'hello', (220, 220), GREEN))
-        win.objects.append(Text(img, 'OpenCV', (220, 320), RED))
-        
-        pts = np.array([[10,5],[220,30],[70,320],[350,310]], np.int32)
-        win.objects.append(Polygon(img, pts, RED, 2))
+        x, y = 50, 50
+        for m in markers:
+            Marker((x, y), markerType=m)
+            x += 50
 
-        win.draw()
+        x, y = 50, 100
+        for m in markers:
+            Marker((x, y), markerType=m, thickness=3)
+            x += 50
+
+        App.win.draw()
 
 if __name__ == '__main__':
     Demo().run()
