@@ -14,6 +14,32 @@ WHITE = (255, 255, 255)
 def help():
     print('--- HELP ---')
 
+# class Vec2:
+#     def __init__(self, x=0, y=0):
+#         self.x = x
+#         self.y = x
+
+#     def __add__(self, other):
+#         return Vec2(self.x + other.x, self.y + other.y)
+
+
+class Node:
+    def __init__(self, parent, pos, size):
+        self.img = App.win.img
+        self.parent = parent
+        self.parent.children.append(self)
+        self.children = []
+
+        self.pos = np.array(pos)
+        self.size = np.array(size)
+
+    def draw(self, pos=(0, 0)):
+        x, y = np.array(pos) + self.pos
+        w, h =  self.size
+        cv.rectangle(self.img, (x, y, w, h), RED, 1)
+
+        for child in self.children:
+            child.draw(self.pos)
 
 class Object:
     """Add an object to the current window."""
@@ -30,21 +56,30 @@ class Object:
         self.size = w, h = d['size']
         self.text = ''
         self.selected = False
+        self.debug = True
+        self.children = []
 
         d['id'] += 1
-        d['pos'] = x, y + h + 10
+        d['pos'] = x, y + h + d['gap']
 
         App.win.draw()
+        print(self.__dict__.keys())
 
     def __str__(self):
         return 'Object {} at ({}, {})'.format(self.id, *self.pos)
 
-    def draw(self):
+    def draw(self, pos = np.array((0, 0))):
         x, y = self.pos
         w, h = self.size
         cv.rectangle(self.img, (x, y, w, h), App.options['obj_color'], 1)
         if self.selected:
             cv.rectangle(self.img, (x-2, y-2, w+2, h+2), App.options['sel_color'], 2)
+        if self.debug:
+            text = 'Object ' + str(self.id)
+            cv.putText(self.img, text, (x, y), 1, 1, RED)
+
+    def add(self, child):
+        self.children.append(child)
 
     def is_inside(self, x, y):
         """Check if the point (x, y) is inside the object."""
@@ -92,6 +127,8 @@ class Text(Object):
         self.text = text
         (w, h), b = self.get_size()
         self.size = w, h+b
+        App.win.obj_options['size'] = self.size
+        App.win.draw()
 
     def draw(self):
         super().draw()
@@ -105,13 +142,29 @@ class Text(Object):
         return cv.getTextSize(self.text, d['fontFace'], d['fontScale'],d['thickness'])
 
 
+class Button(Text):
+    def __init__(self, text, cmd):
+        super().__init__()
+
+
+class Listbox(Object):
+    def __init__(self, items):
+        self.items = items.split(';')
+
+        App.win.obj_options['gap']=0
+        for item in self.items:
+            Text(item, fontScale=1)
+
+
 class Window:
     """Create a window for the app."""
-    obj_options = dict(pos=(20, 20), size=(100, 30), id=0)
+    obj_options = dict(pos=(20, 20), size=(100, 30), gap=5, id=0)
 
     def __init__(self, win=None, img=None):
         App.wins.append(self)
         App.win = self
+
+        self.children = []
 
         self.objs = []
         self.obj = None
@@ -186,6 +239,9 @@ class Window:
         for obj in self.objs:
             obj.draw()
 
+        for child in self.children:
+            child.draw()
+
         cv.imshow(self.win, self.img)
 
     def select_next_obj(self):
@@ -221,28 +277,16 @@ class App:
 
     def __init__(self):
         # cv.namedWindow('window0')
-
         self.shortcuts = {'h': help,
                           'i': self.inspect,
                           'w': Window,
                           'o': Object, 
                           't': Text,}
-
         Window()
-        Text(color=GREEN)
-        Text('Hello', thickness=2)
-        Text('ABC', fontScale=2)
-        Text(pos=(200,20), color=RED)
-
-        Window()
-        Object()
-        Text()
-        Text()
 
     def run(self):
         while True:
             key = cv.waitKey(0)
-
             if key >= 0:
                 k = chr(key)
                 if not App.win.key(k):

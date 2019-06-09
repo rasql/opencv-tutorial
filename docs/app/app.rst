@@ -594,7 +594,26 @@ function to get the new size::
         return cv.getTextSize(self.text, d['fontFace'], d['fontScale'],d['thickness'])
 
 
+Creating the Button class
+-------------------------
+
+Listbox class
+-------------
+
+
 Toggle visibility of objects
 ----------------------------
 
+Features to add:
 
+* children of objects
+* display object frames
+
+Classes:
+
+* Button
+* Entry
+* Combobox
+* Listbox
+* Rectangle, Circle, Ellipse, Polygon
+* Line, Arrow, Marker
