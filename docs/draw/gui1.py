@@ -1,9 +1,6 @@
 """GUI buttons, input fields, listviews."""
 from cvlib import *
 
-L = 'Rectangle;Line;Circle;Ellipse;Polygon;Text'.split(';')
-print(L)
-
 def myfunction():
     print('This is myfunction')
 
@@ -18,7 +15,7 @@ class Demo(App):
         Button('myfunction', myfunction)
         Button('Button', Button)
         Button('Window', Window)
-        Text('OpenCV', (100, 100), WHITE, 1)
+        # Text('OpenCV', (100, 100))
 
         Combobox('Days', 'Mon;Tue;Wed', 'print(self.get())', (300, 100))
         Combobox('Options', 'A;B;C', 'print(self.get())')

@@ -8,12 +8,27 @@ class Demo(App):
         img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
         win = Window('window', img)
 
-        Object(color=MAGENTA, shift=2)
-        Object(color=WHITE)
-        Object(thickness=3)
+        Object()
+        Object()
+        Object(size=(140, 60))
+        Object()
 
-        Object((300, 30), (200, 60), color=GREEN)
-        Object(thickness=5)
+        Object(pos=(200, 50))
+        Object()
+        Object(size=(50, 50), dir=(1, 0))
+        Object()
+        Object()
+        Object()
+        
+        Window('win2', img)
+        Object()
+        Object()
+        Object(size=(140, 60))
+        Object()
+
+        Object(pos=(200, 50))
+        Object()
+        Object(dir=(1, 0))
         Object()
 
         App.win.draw()

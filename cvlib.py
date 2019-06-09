@@ -13,9 +13,13 @@ WHITE = (255, 255, 255)
 
 class Window:
     """Create a window with an image and add graphics objects."""
+    
     def __init__(self, win='window', img=[]):
         App.wins.append(self)
         App.win = self
+
+        self.options = dict( pos=(20, 20), size=(100, 40),
+                    gap = (10, 10), dir = (0, 1))
 
         self.win = win
         if len(img) == 0:
@@ -56,7 +60,9 @@ class Window:
 
     def mouse(self, event, x, y, flags, param):
         """Mouse callback."""
-        
+        text ='{} in ({}, {}) flags={}, param={}'.format(event, x, y, flags, param)
+        cv.displayStatusBar(self.win, text, 1000)
+
         if event == cv.EVENT_LBUTTONDOWN:
             # draw_selection objects under mouse click
             self.select_obj_at(event, x, y, flags, param)
@@ -72,10 +78,20 @@ class Window:
             if flags == cv.EVENT_FLAG_ALTKEY:
                 rect = Rectangle(self.img, (x, y), (x, y), RED, 3)
                 self.objects.append(Rectangle(rect))
+
+            if flags == cv.EVENT_FLAG_SHIFTKEY:
+                self.pos0 = x, y
             
         elif event == cv.EVENT_MOUSEMOVE:
             if flags == cv.EVENT_FLAG_ALTKEY:
+                print('ALT')
                 self.objects[-1].set_p1(x, y)
+
+            elif flags == cv.EVENT_FLAG_CTRLKEY:
+                print('CTRL KEY')
+
+            elif flags == cv.EVENT_FLAG_SHIFTKEY:
+                self.obj.pos = x, y
                     
         elif event == cv.EVENT_LBUTTONUP:
             cv.displayOverlay(self.win, 'Mouse released', 1000)
@@ -138,28 +154,22 @@ class Window:
 
 class Object():
     """General-purpose object."""
-    # options = dict(pos=(20, 20), size=(100, 40), dx=10)
-    pos=(20, 20)
-    size=(100, 40)
-    dx=10
+    # options = dict( pos=(20, 20), size=(100, 40),
+    #                 gap = (10, 10), dir = (0, 1))  
  
-    def __init__(self, pos=None, size=None, **options):
+    def __init__(self, **options):
         App.win.objects.append(self)
         self.img = App.win.img
         
-        if pos == None:
-            pos = Object.pos[:]
-        else:
-            Object.pos = list(pos)
-        self.pos = pos[:]
+        d = App.win.options
+        d.update(options)
+        self.pos = d['pos']
+        self.size = d['size']
         
-        if size == None:
-            size = Object.size[:]
-        else:
-            Object.size = list(size)
-        self.size = size[:]
-
-        Object.pos[1] += size[1] + Object.dx
+        x, y = d['pos']
+        x += d['dir'][0] * (d['size'][0] + d['gap'][0])
+        y += d['dir'][1] * (d['size'][1] + d['gap'][1])
+        d['pos'] = (x, y)
 
         self.text = ''
         self.selected = False
@@ -171,14 +181,16 @@ class Object():
         return '{} at ({}, {}) of size ({}, {})'.format(obj, *self.pos, *self.size)
 
     def draw(self):
-        d = self.options
-        cv.rectangle(self.img, (*self.pos, *self.size), d['color'], d['thickness'])
+        cv.rectangle(self.img, (*self.pos, *self.size), WHITE, 1)
         self.draw_selection()
         
     def draw_selection(self):
         """Draw a bounding box around the object if it is selected."""
         if self.selected:
-            cv.rectangle(self.img, (*self.pos, *self.size), BLUE, 1)
+            x, y = self.pos
+            w, h = self.size
+            d = 3
+            cv.rectangle(self.img, (x-d, y-d, w+2*d, h+2*d), YELLOW, 2)
 
     def mouse(self, event, x, y, flags, param):
         """Execute cmd() or eval(cmd)."""
@@ -215,12 +227,13 @@ class Object():
         return x0 <= x <= x0+w and y0 <= y <= y0+h
 
     def set_pos_size(self, p0, p1):
+        d = App.win.options
         self.p0 = p0
         self.p1 = p1
         x0, y0 = p0
         x1, y1 = p1
-        self.pos = min(x0, x1), min(y0, y1)
-        self.size = abs(x1-x0), abs(y1-y0)
+        d['pos'] = min(x0, x1), min(y0, y1)
+        d['size'] = abs(x1-x0), abs(y1-y0)
 
 
 class Arrow(Object):
@@ -229,7 +242,7 @@ class Arrow(Object):
 
     def __init__(self, p0, p1, **options):
         self.set_pos_size(p0, p1)
-        super().__init__(self.pos, self.size)
+        super().__init__()
         Arrow.options.update(options)
         self.options = Arrow.options.copy()
 
@@ -244,7 +257,7 @@ class Line(Object):
 
     def __init__(self, p0, p1, **options):
         self.set_pos_size(p0, p1)
-        super().__init__(self.pos, self.size)
+        super().__init__()
         Line.options.update(options)
         self.options = Line.options.copy()
 
@@ -259,7 +272,7 @@ class Marker(Object):
 
     def __init__(self, p0, **options):
         self.set_pos_size(p0, p0)
-        super().__init__(self.pos, self.size)
+        super().__init__()
         Marker.options.update(options)
         self.options = Marker.options.copy()
 
@@ -288,8 +301,6 @@ class Circle(Object):
     options = dict(color=MAGENTA)
 
     def __init__(self, center, r, **options):
-        self.r = r
-        self.center = center
         x, y = center
         self.pos = x-r, y-r
         self.size = 2*r, 2*r
@@ -298,7 +309,9 @@ class Circle(Object):
         self.options = Circle.options.copy()
     
     def draw(self):
-        cv.circle(self.img, self.center, self.r, **self.options)
+        x, y = self.pos
+        r = self.size[0]//2
+        cv.circle(self.img, (x+r, y+r), r, **self.options)
         self.draw_selection()
 
 
@@ -382,51 +395,21 @@ class Text(Object):
         self.pts[1] = x + w, y - h
         self.set_bbox()
 
-# class Vec2:
-#     def __def__(self, x=0, y=0):
-#         self.x = x
-#         self.y = y
-
-#     def __add__(self, other):
-#         return Vec2(self.x + other.x, self.y, other.y)
-
-
 class Button(Object):
-    bg = YELLOW
-    fg = RED
-    size = [160, 50]
-    font = cv.FONT_HERSHEY_SIMPLEX
+    options = dict( bg = YELLOW, fg = RED, size =(160, 50))
 
-    def __init__(self, label='Button', cmd='', pos=None, size=None):
+    def __init__(self, label='Button', cmd='', **options):
+        Button.options.update(options)
+        self.options = Button.options.copy()
+
         self.text = label
-        self.font = Button.font
-        self.scale = 1
-        self.fg = Button.fg
-        self.bg = Button.bg
-
-        if pos == None:
-            pos = App.pos[:]
-        else:
-            App.pos = list(pos)
-
-        if size == None:
-            size = Button.size
-        else:
-            Button.size = list(size)
-        
-        App.pos[1] += Button.size[1] + Object.dy
-        
-        x, y = pos
-        w, h = size
-        p1 = x+w, y+h
-
-        super().__init__((pos, p1), Button.fg, 1)
+        super().__init__()
         self.cmd = cmd
 
     def draw(self):
-        x0, y0, x1, y1 = self.bbox
-        cv.rectangle(self.img, (x0, y0),(x1, y1), self.bg, -1)
-        cv.putText(self.img, self.text, (x0+5, y1-5), self.font, self.scale, self.fg, 2, cv.LINE_AA)
+        d = self.options
+        cv.rectangle(self.img, (* self.pos, *self.size), d['bg'], -1)
+        # cv.putText(self.img, self.text, self.pos, self.font, self.scale, self.fg)
         self.draw_selection()
 
 class Combobox(Object):

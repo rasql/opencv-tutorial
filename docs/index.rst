@@ -11,7 +11,8 @@ Welcome to the OpenCV tutorial
    :caption: Contents:
 
    intro/intro
-
+   app/app
+   draw/draw
 
 
 Indices and tables
