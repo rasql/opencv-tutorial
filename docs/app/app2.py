@@ -1,5 +1,5 @@
 """Display a listbox object."""
-from app import *
+from cvlib import *
 
 class Demo(App):
     def __init__(self):
@@ -8,7 +8,6 @@ class Demo(App):
         Window()
         Listbox()
         Button()
-
 
 if __name__ == '__main__':
     Demo().run()

@@ -61,8 +61,7 @@ Shortcut keys
 -------------
 
 It is convienent for an application to have shortcut keys. The most efficient way to 
-define to associate certain keys with a function is to use a dictionary::
-
+define to associate certain keys with a function is to use a dictionary.
 In the App class **init** function we add::
 
     self.shortcuts = {  'h': help, 
@@ -690,35 +689,3 @@ the ``np.maximum`` function finds the maximum coordinates of two vectors::
         for node in self.children:
             p = np.maximum(p, node.pos+node.size)
         self.size = p
-
-
-Creating the Button class
--------------------------
-
-Listbox class
--------------
-
-
-Toggle visibility of objects
-----------------------------
-
-Features to add:
-
-* children of objects
-* display object frames
-
-Classes:
-
-* Button
-* Entry
-* Combobox
-* Listbox
-* Rectangle, Circle, Ellipse, Polygon
-* Line, Arrow, Marker
-
-Warning
-
-**win** is used for
-
-* window name such as imshow(win, img)
-* Window class reference such as Object.win

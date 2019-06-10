@@ -16,5 +16,11 @@ Markers
 
 .. autoclass:: shape1.Demo
 
+.. image:: shape1.png
 
+Automatic placement
+-------------------
 
+.. autoclass:: shape2.Demo
+
+.. image:: shape2.png

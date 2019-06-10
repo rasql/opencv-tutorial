@@ -155,6 +155,3 @@ Mouse callback::
     
     cv.createTrackbar('name', 'win', 0, max, cb)
     cv.getTrackbarPos('name', 'win')
-
-
-https://docs.quantifiedcode.com/python-anti-patterns/ 

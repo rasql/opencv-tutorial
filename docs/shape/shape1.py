@@ -7,8 +7,6 @@ class Demo(App):
 
         Window()
         TextNode()
-        for marker in markers:
-            Marker(markerType=marker, dir=(1, 0))
 
 if __name__ == '__main__':
     Demo().run()

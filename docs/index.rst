@@ -13,6 +13,8 @@ Welcome to the OpenCV tutorial
    intro/intro
    app/app
    draw/draw
+   shape/shape
+   widget/widget
 
 
 Indices and tables

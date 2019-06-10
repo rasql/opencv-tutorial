@@ -281,13 +281,11 @@ class Window:
 
         if event == cv.EVENT_LBUTTONDOWN:
             App.win = self
-
-            self.node = None
-            for child in self.children:
-                child.selected = False
-                if child.is_inside((x, y)):
-                    child.selected = True
-                    self.node = child
+            
+            if flags & cv.EVENT_FLAG_SHIFTKEY:
+                self.new(pos=(x, y))
+            else:
+                self.select_node(x, y)
 
         if event == cv.EVENT_MOUSEMOVE:
             if flags == cv.EVENT_FLAG_ALTKEY and self.node != None:
@@ -322,6 +320,15 @@ class Window:
             child.draw()
 
         cv.imshow(self.win, self.img)
+
+    def select_node(self, x, y):
+        """Select oblect at position (x, y)."""
+        self.node = None
+        for child in self.children:
+            child.selected = False
+            if child.is_inside((x, y)):
+                child.selected = True
+                self.node = child
 
     def select_next_node(self):
         """Select the next object, or the first in none is selected."""
@@ -365,7 +372,12 @@ class App:
                           'n': Node,
                           't': TextNode,
                           'b': Button,
-                          'l': Listbox, }
+                          'l': Listbox,
+                          'e': self.edit_mode }
+
+        self.classes = [Marker, Line, Arrow, Rectangle, Node, TextNode]
+        self.class_id = 0
+        self.new = Marker
 
     def run(self):
         while True:
@@ -375,15 +387,22 @@ class App:
                 if not App.win.key(k):
                     self.key(k)
 
+    def key(self, k):
+        if k in self.shortcuts:
+            self.shortcuts[k]()
+
     def inspect(self):
         print('--- INSPECT ---')
         print('App.wins', App.wins)
         print('App.win', App.win)
 
-    def key(self, k):
-        if k in self.shortcuts:
-            self.shortcuts[k]()
-
+    def edit_mode(self):
+        self.class_id += 1
+        self.class_id %= len(self.classes)
+        App.win.new = self.classes[self.class_id]
+        print(App.win.new)
+        text = 'Insert new {}'.format(App.win.new.__name__)
+        cv.displayStatusBar(App.win.win, text, 1000)
 
 if __name__ == '__main__':
     App().run()
