@@ -9,453 +9,381 @@ BLUE = (255, 0, 0)
 YELLOW = (0, 255, 255)
 CYAN = (255, 255, 0)
 MAGENTA = (255, 0, 255)
+GRAY = (127, 127, 127)
 WHITE = (255, 255, 255)
 
-class Window:
-    """Create a window with an image and add graphics objects."""
-    
-    def __init__(self, win='window', img=[]):
-        App.wins.append(self)
-        App.win = self
 
-        self.options = dict( pos=(20, 20), size=(100, 40),
-                    gap = (10, 10), dir = (0, 1))
+def help():
+    print('--- HELP ---')
 
-        self.win = win
-        if len(img) == 0:
-            img = np.zeros((200, 600, 3), np.uint8)
-        self.img = img
-        self.img0 = img.copy()
-        
-        self.objects = []
-        self.obj = None
-        self.obj_id = 0
-        self.obj_visible = True
-        cv.imshow(win, img)
-        self.overlay = 'Keys: '
-        self.shortcuts = {  'o':'self.show_object()',
-                            'd':'self.objects.pop(self.obj_id)', 
-                            'v':self.toggle_visible,
-                            '\b':self.delete_selected,
-        }
-        cv.setMouseCallback(win, self.mouse)
+class Node:
+    """Create a tree node to add graphic objects to a window."""
+    options = dict( pos=np.array((20, 20)),
+                    size=np.array((100, 20)),
+                    gap=np.array((10, 10)),
+                    dir=np.array((0, 1)),)
 
-    def draw(self):
-        """Reset the image and add graphics objects."""
-        self.img[:] = self.img0[:]  
-
-        for obj in self.objects:
-            if obj.visible:
-                obj.draw()
-
-        cv.imshow(self.win, self.img)
-    
-    def key(self, k):
-        """Handle key press event by selected object or as shortcut."""
-        if self.obj != None:
-            self.obj.key(k)
-        else:
-            self.do_shortcut(k)
-        self.draw()
-
-    def mouse(self, event, x, y, flags, param):
-        """Mouse callback."""
-        text ='{} in ({}, {}) flags={}, param={}'.format(event, x, y, flags, param)
-        cv.displayStatusBar(self.win, text, 1000)
-
-        if event == cv.EVENT_LBUTTONDOWN:
-            # draw_selection objects under mouse click
-            self.select_obj_at(event, x, y, flags, param)
-
-            App.win = self
-            self.p0 = x, y
-            self.p1 = x, y
-            self.text = 'p0 = ({}, {})'.format(x, y)
-            cv.displayStatusBar(self.win, self.text, 2000)
-            cv.displayOverlay(self.win, self.text, 1000)
-
-            # draw rectangle if ALT key is pressed
-            if flags == cv.EVENT_FLAG_ALTKEY:
-                rect = Rectangle(self.img, (x, y), (x, y), RED, 3)
-                self.objects.append(Rectangle(rect))
-
-            if flags == cv.EVENT_FLAG_SHIFTKEY:
-                self.pos0 = x, y
-            
-        elif event == cv.EVENT_MOUSEMOVE:
-            if flags == cv.EVENT_FLAG_ALTKEY:
-                print('ALT')
-                self.objects[-1].set_p1(x, y)
-
-            elif flags == cv.EVENT_FLAG_CTRLKEY:
-                print('CTRL KEY')
-
-            elif flags == cv.EVENT_FLAG_SHIFTKEY:
-                self.obj.pos = x, y
-                    
-        elif event == cv.EVENT_LBUTTONUP:
-            cv.displayOverlay(self.win, 'Mouse released', 1000)
-
-        self.draw()
-
-    def trackbar(self, x):
-        """Trackbar callback function"""
-        self.x = x
-        text = 'Trackbar = {}'.format(x)
-        cv.displayOverlay(self.win, text, 1000)
-        cv.imshow(self.win, self.img)
-
-    def show_object(self):
-        """Cycle through the objects and display in Overlay."""
-        n = len(self.objects)
-        self.obj_id %= n
-        self.objects[self.obj_id].selected = False
-        self.obj_id += 1
-        self.obj_id %= n
-        self.objects[self.obj_id].selected = True
-        text = str(self.objects[self.obj_id])
-        cv.displayOverlay(self.win, text, 1000)
-        cv.imshow(self.win, self.img)
-
-    def toggle_visible(self):
-        """Toggle visibility of all objects."""
-        self.obj_visible = not self.obj_visible
-        for obj in self.objects:
-            obj.visible = self.obj_visible
-
-    def delete_selected(self):
-        """Delete selected objects."""
-        for obj in self.objects:
-            if obj.selected:
-                self.objects.remove(obj)
-
-    def do_shortcut(self, k):
-        """Execute key-cmd shortcut as cmd() or exec(cmd)."""
-        if k in self.shortcuts.keys():
-            cmd = self.shortcuts[k]
-            if isinstance(cmd, str):
-                try:
-                    exec(cmd)
-                except:
-                    print('Shortcut error:', sys.exc_info()[0], cmd)
-            else:
-                cmd()
-
-    def select_obj_at(self, event, x, y, flags, param):
-        """Select objects at (x, y)."""
-        self.obj = None
-        for obj in self.objects:
-            obj.selected = False
-            if obj.is_inside(x, y):
-                obj.selected = True
-                obj.mouse(event, x, y, flags, param)
-                self.obj = obj
-
-
-class Object():
-    """General-purpose object."""
-    # options = dict( pos=(20, 20), size=(100, 40),
-    #                 gap = (10, 10), dir = (0, 1))  
- 
-    def __init__(self, **options):
-        App.win.objects.append(self)
+    def __init__(self, level=0, **options):
+        self.win = App.win
         self.img = App.win.img
-        
-        d = App.win.options
-        d.update(options)
-        self.pos = d['pos']
-        self.size = d['size']
-        
-        x, y = d['pos']
-        x += d['dir'][0] * (d['size'][0] + d['gap'][0])
-        y += d['dir'][1] * (d['size'][1] + d['gap'][1])
-        d['pos'] = (x, y)
 
-        self.text = ''
+        # set Node class options
+        self.set_node_options(options)
+
+        # select parent node
+        if level == -1:
+            self.level_up()
+        elif level == +1:
+            parent = self.win.stack[-1].children[-1]
+            Node.options['pos'] = Node.options['gap']
+            self.win.stack.append(parent)
+
+        # attach node to parent
+        self.parent = self.win.stack[-1]
+        self.parent.children.append(self)
+        self.children = []
         self.selected = False
-        self.visible = True
-        self.cmd = 'print(self)'
+        self.frame = True
+
+        # create instance attributes
+        self.pos = None
+        self.size = None
+        self.gap = None
+        self.dir = None
+
+        # update instance attributes from node options
+        self.__dict__.update(Node.options)
+
+        pos = self.pos + (self.size+self.gap)*self.dir
+        Node.options['pos'] = pos
+        # cv.imshow(self.win.win, self.img)
 
     def __str__(self):
         obj = self.__class__.__name__
-        return '{} at ({}, {}) of size ({}, {})'.format(obj, *self.pos, *self.size)
+        return '{} at {}'.format(obj, self.pos)
 
-    def draw(self):
-        cv.rectangle(self.img, (*self.pos, *self.size), WHITE, 1)
-        self.draw_selection()
-        
-    def draw_selection(self):
-        """Draw a bounding box around the object if it is selected."""
+    def set_node_options(self, options):
+        """Update Node class options."""
+        for k, v in options.items():
+            if k in Node.options:
+                if isinstance(v, tuple):
+                    v = np.array(v)
+                Node.options[k] = v
+ 
+    def set_class_options(self, options):
+        """Update class options and set instance options."""
+        for k, v in options.items():
+            if k in self.__class__.options:
+                if isinstance(v, tuple):
+                    v = np.array(v)
+                self.__class__.options[k] = v
+        self.options = self.__class__.options.copy()
+
+
+    def level_up(self):
+        """Enclose the current children and move up one level."""
+        n = self.win.stack[-1]
+        n.enclose_children()
+
+        # update the position
+        pos = n.pos + (n.size+n.gap)*n.dir
+        self.win.node_options['pos'] = pos
+        self.win.stack.pop()
+
+    def draw(self, pos=np.array((0, 0))):
+        x, y = pos + self.pos
+        w, h = self.size
+        if self.frame:
+            cv.rectangle(self.img, (x, y, w, h), RED, 1)
         if self.selected:
-            x, y = self.pos
-            w, h = self.size
-            d = 3
-            cv.rectangle(self.img, (x-d, y-d, w+2*d, h+2*d), YELLOW, 2)
+            cv.rectangle(self.img, (x-2, y-2, w+4, h+4), GREEN, 1)
+
+        for child in self.children:
+            child.draw(self.pos)
+
+    def is_inside(self, pos):
+        """Check if the point (x, y) is inside the object."""
+        pos = np.array(pos)
+        return all(self.pos < pos) and all(pos < self.pos+self.size)
 
     def mouse(self, event, x, y, flags, param):
-        """Execute cmd() or eval(cmd)."""
-        if isinstance(self.cmd, str):
-            try:
-                exec(self.cmd)
-            except:
-                print('Shortcut error:', sys.exc_info()[0], self.cmd)
-        else:
-            self.cmd()
+        if event == cv.EVENT_LBUTTONDOWN:
+            print('mouse in', self)
 
     def key(self, k):
-        """Add key charactor to text field."""
+        print('key', k, 'in', self)
+
+    def enclose_children(self):
+        p = np.array((0, 0))
+        for node in self.children:
+            p = np.maximum(p, node.pos+node.size)
+        self.size = p + self.gap
+
+
+class TextNode(Node):
+    options = dict(fontFace=cv.FONT_HERSHEY_SIMPLEX,
+                   fontScale=1,
+                   color=GREEN,
+                   thickness=2,
+                   lineType=cv.LINE_8,)
+
+    def __init__(self, text='TextNode', **options):
+        super().__init__(**options)
+        self.text = text
+        self.options = TextNode.options
+        (w, h), b = self.get_size()
+        self.size = np.array((w, h+b))
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        (w, h), b = self.get_size()
+        x, y = pos + self.pos
+        cv.putText(self.img, self.text, (x, y+h), **self.options)
+
+    def get_size(self):
+        """Returns the text size and baseline under the forme (w, h), b."""
+        d = self.options
+        return cv.getTextSize(self.text, d['fontFace'], d['fontScale'], d['thickness'])
+
+    def key(self, k):
         if k == '\b':
             self.text = self.text[:-1]
         elif k == '\r':
-            self.obj = None
-            self.selected = False
-        elif k == '\0':
-            pass
-        else:
+            print('Enter')
+        elif ord(k) < 128:
+            if App.win.shift:
+                k = k.upper()
             self.text += k
-        self.set_size_to_text()
-
-    def set_size_to_text(self):
-        """Set bounding box to text size."""
-        # (w, h), b = cv.getTextSize(self.text, self.font, self.scale, 1)
-        # self.size = w, h
-
-    def is_inside(self, x, y):
-        """Check if point (x, y) is inside the object."""
-        x0, y0 = self.pos
-        w, h = self.size
-        return x0 <= x <= x0+w and y0 <= y <= y0+h
-
-    def set_pos_size(self, p0, p1):
-        d = App.win.options
-        self.p0 = p0
-        self.p1 = p1
-        x0, y0 = p0
-        x1, y1 = p1
-        d['pos'] = min(x0, x1), min(y0, y1)
-        d['size'] = abs(x1-x0), abs(y1-y0)
+        (w, h), b = self.get_size()
+        self.size = w, h+b
 
 
-class Arrow(Object):
-    """Create an arrowed line."""
-    options = dict(color=CYAN)
+class Marker(Node):
+    options = dict( color=GREEN,
+                    markerType=cv.MARKER_CROSS,
+                    markerSize=20,
+                    thickness=1,
+                    line_type=8)
 
-    def __init__(self, p0, p1, **options):
-        self.set_pos_size(p0, p1)
-        super().__init__()
-        Arrow.options.update(options)
-        self.options = Arrow.options.copy()
-
-    def draw(self):
-        cv.arrowedLine(self.img, self.p0, self.p1, **self.options)
-        self.draw_selection()
-
-
-class Line(Object):
-    """Create a line object."""
-    options = dict(color=RED)
-
-    def __init__(self, p0, p1, **options):
-        self.set_pos_size(p0, p1)
-        super().__init__()
-        Line.options.update(options)
-        self.options = Line.options.copy()
-
-    def draw(self):
-        cv.line(self.img, self.p0, self.p1, **self.options)
-        self.draw_selection()
-
-
-class Marker(Object):
-    """Create a marker object."""
-    options = dict(color=GREEN)
-
-    def __init__(self, p0, **options):
-        self.set_pos_size(p0, p0)
-        super().__init__()
-        Marker.options.update(options)
-        self.options = Marker.options.copy()
-
-    def draw(self):
-        cv.drawMarker(self.img, self.p0, **self.options)
-        self.draw_selection()
-
-
-class Rectangle(Object):
-    """Create a rectangle object."""
-    options = dict(color=BLUE)
-
-    def __init__(self, p0, p1, **options):
-        self.set_pos_size(p0, p1)
-        super().__init__(self.pos, self.size)
-        Rectangle.options.update(options)
-        self.options = Rectangle.options.copy()
-
-    def draw(self):
-        cv.rectangle(self.img, (*self.pos, *self.size), **self.options)
-        self.draw_selection()
-
-
-class Circle(Object):
-    """Create a circle object."""
-    options = dict(color=MAGENTA)
-
-    def __init__(self, center, r, **options):
-        x, y = center
-        self.pos = x-r, y-r
-        self.size = 2*r, 2*r
-        super().__init__(self.pos, self.size)
-        Circle.options.update(options)
-        self.options = Circle.options.copy()
-    
-    def draw(self):
-        x, y = self.pos
-        r = self.size[0]//2
-        cv.circle(self.img, (x+r, y+r), r, **self.options)
-        self.draw_selection()
-
-
-class Ellipse(Object):
-    """Create an ellipse object."""
-    options = dict(angle=0, startAngle=0, endAngle=360, color=GREEN)
-
-    def __init__(self, center, axes, **options):
-
-        self.center = center
-        self.axes = axes
-        x, y = center
-        a, b = axes
-        self.pos = x-a, y-b
-        self.size = 2*a, 2*b
-        super().__init__(self.pos, self.size)
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.set_class_options(options)
         
-        Ellipse.options.update(options)
-        self.options = Ellipse.options.copy()
+        self.size = np.array((20, 20))
+        self.frame = False
+        cv.imshow(self.win.win, self.img)
 
-    def draw(self):
-        cv.ellipse(self.img, self.center,  self.axes, **self.options)
-        self.draw_selection()
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        x, y = pos + self.pos + (10, 10)
+        cv.drawMarker(self.img, (x, y), **self.options)
+
+class Line(Node):
+    options = dict( color=GREEN,
+                    thickness=1,
+                    lineType=cv.LINE_8,
+                    shift=0)
+
+    def __init__(self):
+        super().__init__(**options)
+        self.set_class_options(options)
 
 
-class Polygon(Object):
-    """Createa a polygon object."""
-    options = dict(color=WHITE, isClosed=False)
-
-    def __init__(self, pts, **options):
-        self.pts = pts
-
-        self.set_pos_size(pts) 
-        super().__init__(self.pos, self.size)
-        Polygon.options.update(options)
-        self.options = Polygon.options.copy()
-
-    def draw(self):
-        print(self.pts)
-        cv.polylines(self.img, [self.pts], **self.options)
-        self.draw_selection()
-
-    def set_pos_size(self, pts):
-        xmin, ymin = xmax, ymax = pts[0]
-        for (x, y) in pts[1:]:
-            if x < xmin:
-                xmin = x
-            if x > xmax:
-                xmax = x
-            if y < ymin:
-                ymin = y
-            if y > ymax:
-                ymax = y
-        self.pos = xmin, ymin
-        self.size = xmax-xmin, ymax-ymin
-        
-
-class Text(Object):
-    options = dict( fontFace=cv.FONT_HERSHEY_SIMPLEX,
-                    fontScale=1, thickness=1, color=RED)
-
-    def __init__(self, text, p0, **options):
-        self.text = text
-        d=Text.options
-        (w, h), b = cv.getTextSize(text, d['fontFace'], d['fontScale'], d['thickness'])
-        x, y = p0
-        p1 = x + w, y + h
-        super().__init__(p0, (w, h))
-        self.text = text
-        Text.options.update(options)
-        self.options = Text.options.copy()
-
-    def draw(self):
-        cv.putText(self.img, self.text, self.pos, **self.options)
-        self.draw_selection()
-
-    def set_text(self, text):
-        self.text = text
-        ((w, h), b) = cv.getTextSize(self.text, self.font, self.scale, self.d)
-        x, y = self.pts[0]
-        self.pts[1] = x + w, y - h
-        self.set_bbox()
-
-class Button(Object):
-    options = dict( bg = YELLOW, fg = RED, size =(160, 50))
-
-    def __init__(self, label='Button', cmd='', **options):
-        Button.options.update(options)
-        self.options = Button.options.copy()
-
-        self.text = label
+class Arrow(Node):
+    def __init__(self):
         super().__init__()
-        self.cmd = cmd
+
+
+class Rectangle(Node):
+    def __init__(self):
+        super().__init__()
+
+
+class Circle(Node):
+    def __init__(self):
+        super().__init__()
+
+
+class Ellipse(Node):
+    def __init__(self):
+        super().__init__()
+
+
+class Polygon(Node):
+    def __init__(self):
+        super().__init__()
+
+
+
+
+class Button(Node):
+    def __init__(self, text='Button', cmd=None):
+        super().__init__()
+        TextNode(text, level=1)
+        self.level_up()
+
+
+class Listbox(Node):
+    def __init__(self, items='Item1;Item2;Item3'):
+        self.items = items.split(';')
+
+        super().__init__()
+        TextNode(self.items[0], level=1)
+        for item in self.items[1:]:
+            TextNode(item)
+        self.level_up()
+
+
+class Window:
+    """Create a window for the app."""
+    node_options = dict(pos=np.array((20, 20)),
+                        size=np.array((100, 20)),
+                        gap=np.array((10, 10)),
+                        dir=np.array((0, 1)),
+                        )
+
+    def __init__(self, win=None, img=None):
+        App.wins.append(self)
+        App.win = self
+
+        self.node_options = Window.node_options.copy()
+        self.children = []  # children
+        self.stack = [self]  #  parent stack
+        self.node = None  # currently selected node
+
+        if img == None:
+            img = np.zeros((200, 600, 3), np.uint8)
+            img[:, :] = App.options['win_color']
+
+        if win == None:
+            win = 'window' + str(App.win_id)
+        App.win_id += 1
+
+        self.win = win
+        self.img = img
+        self.img0 = img.copy()
+        self.shift = False
+
+        self.shortcuts = {'\t': self.select_next_node,
+                          chr(27): self.unselect_node,
+                          chr(0): self.toggle_shift, }
+
+        cv.imshow(win, img)
+        cv.setMouseCallback(win, self.mouse)
+
+    def __str__(self):
+        return 'Window: ' + self.win
+
+    def mouse(self, event, x, y, flags, param):
+        text = 'mouse event {} at ({}, {}) with flags {}'.format(
+            event, x, y, flags)
+        cv.displayStatusBar(self.win, text, 1000)
+
+        if event == cv.EVENT_LBUTTONDOWN:
+            App.win = self
+
+            self.node = None
+            for child in self.children:
+                child.selected = False
+                if child.is_inside((x, y)):
+                    child.selected = True
+                    self.node = child
+
+        if event == cv.EVENT_MOUSEMOVE:
+            if flags == cv.EVENT_FLAG_ALTKEY and self.node != None:
+                self.node.pos = np.array((x, y))
+
+        if self.node != None:
+            self.node.mouse(event, x, y, flags, param)
+
+        self.draw()
+
+    def key(self, k):
+        """Handle key events and send them to the current object."""
+        text = 'key {} ({})'.format(k, ord(k))
+        cv.displayStatusBar(self.win, text, 1000)
+
+        if k in self.shortcuts:
+            self.shortcuts[k]()
+            self.draw()
+            return True
+
+        elif self.node != None:
+            self.node.key(k)
+            self.draw()
+            return True
+
+        return False
 
     def draw(self):
-        d = self.options
-        cv.rectangle(self.img, (* self.pos, *self.size), d['bg'], -1)
-        # cv.putText(self.img, self.text, self.pos, self.font, self.scale, self.fg)
-        self.draw_selection()
+        self.img[:] = self.img0[:]
 
-class Combobox(Object):
-    def __init__(self, label, values, cmd, pos=None):
-        # super().__init__
-        pass
+        for child in self.children:
+            child.draw()
 
-class Listbox(Object):
-    def __init__(self, items, cmd, pos=None):
-        # super().__init__():
-        pass
+        cv.imshow(self.win, self.img)
+
+    def select_next_node(self):
+        """Select the next object, or the first in none is selected."""
+        try:
+            i = self.children.index(self.node)
+        except ValueError:
+            i = -1
+        self.children[i].selected = False
+        if self.shift:
+            i = (i-1) % len(self.children)
+        else:
+            i = (i+1) % len(self.children)
+        self.children[i].selected = True
+        self.node = self.children[i]
+
+    def unselect_node(self):
+        if self.node != None:
+            self.node.selected = False
+            self.node = None
+
+    def toggle_shift(self):
+        self.shift = not self.shift
+        if self.shift:
+            cv.displayStatusBar(self.win, 'SHIFT is ON', 1000)
+        else:
+            cv.displayStatusBar(self.win, 'SHIFT is OFF', 1000)
+
 
 class App:
+    """Create the app class."""
     wins = []
-    pos = [20, 20]
-    # pos = np.array([20, 20])  # int64
-    
+    win = None
+    win_id = 0
+    options = dict(win_color=BLACK, obj_color=YELLOW, sel_color=BLUE)
+
     def __init__(self):
-        self.shortcuts = {'i':'self.inspect()'}
-        Window()
+        # cv.namedWindow('window0')
+        self.shortcuts = {'h': help,
+                          'i': self.inspect,
+                          'w': Window,
+                          'n': Node,
+                          't': TextNode,
+                          'b': Button,
+                          'l': Listbox, }
 
     def run(self):
-        """Run the main event loop."""
         while True:
             key = cv.waitKey(0)
-            k = chr(key)
-
-            # Send key event to active window
-            App.win.key(k)
-
-            if k in self.shortcuts.keys():
-                cmd = self.shortcuts[k]
-                try:
-                    exec(cmd)
-                except:
-                    print('Shortcut error:', sys.exc_info()[0], cmd)
-            
-        cv.destroyAllWindows()
+            if key >= 0:
+                k = chr(key)
+                if not App.win.key(k):
+                    self.key(k)
 
     def inspect(self):
-        print('---inspect---', )
-        print('App.wins:', App.wins)
-        print('App.win:', App.win)
+        print('--- INSPECT ---')
+        print('App.wins', App.wins)
+        print('App.win', App.win)
 
-        for obj in App.win.objects:
-            print(obj)
+    def key(self, k):
+        if k in self.shortcuts:
+            self.shortcuts[k]()
+
 
 if __name__ == '__main__':
     App().run()

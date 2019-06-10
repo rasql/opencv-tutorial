@@ -594,6 +594,104 @@ function to get the new size::
         return cv.getTextSize(self.text, d['fontFace'], d['fontScale'],d['thickness'])
 
 
+Creating the Node class
+-----------------------
+
+To place geometric elements into the window we are creating a **Node** class 
+which has the following attributes:
+
+* position (top left corner)
+* size
+* direction of the next object
+* gap between adjacent objects
+
+We store the default options as Node **class attribute**::
+
+    class Node:
+        options = dict( pos=np.array((20, 20)),
+                        size=np.array((100, 40)), 
+                        gap=np.array((10, 10)),
+                        dir=np.array((0, 1)),
+                        )
+
+In the Node constructor, we can change these 4 options by specifing 
+a named parameter. If the parameter is given in the form of a tuple, 
+such as ``size=(50, 20)`` the tuple needs to be transformed into an 
+**np.array**. Only the 4 elements of the options dictionary are updated::
+
+    def __init__(self, parent, **options):
+
+        # update node options from constructor options
+        for k, v in options.items():
+            if k in Node.options:
+                if isinstance(v, tuple):
+                    v = np.array(v)
+                Node.options[k] = v
+
+Then we create empty instance attributes::
+
+       # create instance attributes
+        self.pos = None
+        self.size = None
+        self.gap = None
+        self.dir = None
+
+We give them values from the node optionss::
+
+        # update instance attributes from node options
+        self.__dict__.update(Node.options)
+
+Finally we calculate the next node position::
+
+        pos = self.pos + (self.size+self.gap)*self.dir
+        Node.options['pos'] = pos
+
+Drawing the node
+^^^^^^^^^^^^^^^^
+
+Nodes need to be drawn recursively. If a node has chidren, 
+these need to be drawn as well. The ``draw`` method needs a position
+argument to draw the children with respect to the parent position.
+The default position is (0, 0). If the node is selected, a selection
+rectangle is drawn around it::
+
+    def draw(self, pos=np.array((0, 0))):
+        x, y = pos + self.pos
+        w, h =  self.size
+        cv.rectangle(self.img, (x, y, w, h), RED, 1)
+        if self.selected:
+            cv.rectangle(self.img, (x-2, y-2, w+4, h+4), GREEN, 1)
+
+        for child in self.children:
+            child.draw(self.pos)
+
+Checking if a position is inside
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using the **numpy** library makes 2D calculation easy. We can compare 
+the components of a vector at once, such as ``self.pos < pos``, which
+results in a boolean vector of the form ``[True False]``. The function
+``all()`` returns True if all vector components are True::
+
+    def is_inside(self, pos):
+        """Check if the point (x, y) is inside the object."""
+        pos = np.array(pos)
+        return all(self.pos < pos) and all(pos < self.pos+self.size)
+
+Finde the enclosure for children
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If several nodes are placed inside another node, at the end the size of
+the parent nodes needs to be adapted to enclose all children. Here
+the ``np.maximum`` function finds the maximum coordinates of two vectors::
+
+    def enclose_children(self):
+        p = np.array((0, 0))
+        for node in self.children:
+            p = np.maximum(p, node.pos+node.size)
+        self.size = p
+
+
 Creating the Button class
 -------------------------
 
@@ -617,3 +715,10 @@ Classes:
 * Listbox
 * Rectangle, Circle, Ellipse, Polygon
 * Line, Arrow, Marker
+
+Warning
+
+**win** is used for
+
+* window name such as imshow(win, img)
+* Window class reference such as Object.win
