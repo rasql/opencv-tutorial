@@ -1,4 +1,4 @@
-"""Add markers with a mouse click."""
+"""Add show the different markers."""
 from cvlib import *
 
 class Demo(App):
@@ -6,7 +6,13 @@ class Demo(App):
         super().__init__()
 
         Window()
-        TextNode()
+        markers = cv_dir('MARKER.*')
+
+        for marker in markers:
+            TextNode(marker, fontScale=0.5, thickness=1)
+
+        for m in range(7):
+            Marker(pos=(300, m*25+20), markerType=m)
 
 if __name__ == '__main__':
     Demo().run()

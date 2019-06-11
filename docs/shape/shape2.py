@@ -1,4 +1,4 @@
-"""Display nodes in different directions."""
+"""Draw random lines."""
 from cvlib import *
 
 class Demo(App):
@@ -6,18 +6,14 @@ class Demo(App):
         super().__init__()
 
         Window()
-        
-        for i in range(5):
-            Node(dir=(1, 0), size=(20, 20))
+        TextNode('Random lines')
 
-        for i in range(5):
-            Node(dir=(0, 1))
-
-        for i in range(5):
-            Node(dir=(1, -1))
-
-        for i in range(5):
-            Node(dir=(1, 1))
-
+        for i in range(10):
+            col = random.choice([RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA])
+            p0 = (random.randint(10, 590), random.randint(10, 190))
+            p1 = (random.randint(10, 590), random.randint(10, 190))
+            d = random.randint(1, 5) 
+            Line(p0, p1, thickness=d, color=col)
+            
 if __name__ == '__main__':
     Demo().run()

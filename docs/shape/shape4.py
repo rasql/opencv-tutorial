@@ -1,4 +1,4 @@
-"""Draw random arrows."""
+"""Draw  random rectangles."""
 from cvlib import *
 
 class Demo(App):
@@ -6,14 +6,13 @@ class Demo(App):
         super().__init__()
 
         Window()
-        TextNode('Arrows')
+        TextNode('Rectangles')
 
         for i in range(10):
             col = random.choice([RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA, WHITE])
             p0 = (random.randint(10, 590), random.randint(10, 190))
             p1 = (random.randint(10, 590), random.randint(10, 190))
-            d = random.randint(1, 5) 
-            Arrow(p0, p1, thickness=d, color=col)
+            Rectangle(p0, p1, thickness=-1, color=col)
             
 if __name__ == '__main__':
     Demo().run()

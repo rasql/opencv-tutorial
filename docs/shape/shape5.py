@@ -1,4 +1,4 @@
-"""Draw random arrows."""
+"""Draw  an ellipse."""
 from cvlib import *
 
 class Demo(App):
@@ -6,14 +6,16 @@ class Demo(App):
         super().__init__()
 
         Window()
-        TextNode('Arrows')
+        TextNode('Ellipse')
+
+        Ellipse((200, 100), (200, 30))
 
         for i in range(10):
             col = random.choice([RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA, WHITE])
             p0 = (random.randint(10, 590), random.randint(10, 190))
             p1 = (random.randint(10, 590), random.randint(10, 190))
-            d = random.randint(1, 5) 
-            Arrow(p0, p1, thickness=d, color=col)
+            a = random.randint(0, 360)
+            Ellipse(p0, p1, thickness=2, angle=a, color=col)
             
 if __name__ == '__main__':
     Demo().run()

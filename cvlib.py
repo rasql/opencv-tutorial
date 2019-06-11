@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-import os, sys, math
+import os, re, sys, math, random
 
 BLACK = (0, 0, 0)
 RED = (0, 0, 255)
@@ -13,8 +13,15 @@ GRAY = (127, 127, 127)
 WHITE = (255, 255, 255)
 
 
+def cv_dir(regex):
+    """Return a list of OpenCV attributes which match a regex."""
+    atts = dir(cv)
+    return [s for s in atts if re.match(regex, s)]
+
+
 def help():
     print('--- HELP ---')
+
 
 class Node:
     """Create a tree node to add graphic objects to a window."""
@@ -74,8 +81,6 @@ class Node:
         """Update class options and set instance options."""
         for k, v in options.items():
             if k in self.__class__.options:
-                if isinstance(v, tuple):
-                    v = np.array(v)
                 self.__class__.options[k] = v
         self.options = self.__class__.options.copy()
 
@@ -91,6 +96,7 @@ class Node:
         self.win.stack.pop()
 
     def draw(self, pos=np.array((0, 0))):
+
         x, y = pos + self.pos
         w, h = self.size
         if self.frame:
@@ -119,8 +125,139 @@ class Node:
             p = np.maximum(p, node.pos+node.size)
         self.size = p + self.gap
 
+    def set_pos_size(self, pts):
+        """Set position and size from the list of points."""
+        min = np.amin(pts, axis=0)
+        max = np.amax(pts, axis=0)
+        
+        self.pts = pts-min
+        self.pos = min
+        self.size = max-min
 
-class TextNode(Node):
+class Node2(Node):
+    """Node based on two points (p0, p1)."""
+    def __init__(self, p0, p1, **options):
+        super().__init__(**options)
+
+        self.pts = np.array([p0, p1])
+        self.set_pos_size(self.pts)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        pts = pos + self.pos + self.pts
+        self.abs_pts = tuple(map(tuple, pts))
+
+
+class Marker(Node):
+    options = dict( color=GREEN,
+                    markerType=cv.MARKER_CROSS,
+                    markerSize=20,
+                    thickness=1,
+                    line_type=8)
+
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.set_class_options(options)
+        
+        self.size = np.array((20, 20))
+        self.frame = False
+        cv.imshow(self.win.win, self.img)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        x, y = pos + self.pos + (10, 10)
+        cv.drawMarker(self.img, (x, y), **self.options)
+
+class Line(Node2):
+    options = dict( color=GREEN,
+                    thickness=1,
+                    lineType=cv.LINE_8,
+                    shift=0)
+
+    def __init__(self, p0, p1, **options):
+        super().__init__(p0, p1, **options)
+        self.set_class_options(options)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        cv.line(self.img, *self.abs_pts, **self.options)
+
+
+class Arrow(Node2):
+    options = dict( color=RED,
+                thickness=1,
+                line_type=cv.LINE_8,
+                shift=0,
+                tipLength=0.1)
+                    
+    def __init__(self, p0, p1, **options):
+        super().__init__(p0, p1, **options)
+        self.set_class_options(options)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        cv.arrowedLine(self.img, *self.abs_pts, **self.options)
+
+
+class Rectangle(Node2):
+    options = dict( color=GREEN,
+                    thickness=1,
+                    lineType=cv.LINE_8,
+                    shift=0)
+
+    def __init__(self, p0, p1, **options):
+        super().__init__(p0, p1, **options)
+        self.set_class_options(options)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        cv.rectangle(self.img, *self.abs_pts, **self.options)
+
+
+class Circle(Node):
+    def __init__(self):
+        super().__init__()
+
+
+class Ellipse(Node2):
+    options = dict( angle=0,
+                    startAngle=0,
+                    endAngle=360,
+                    color=RED,
+                    thickness=1,
+                    lineType=cv.LINE_8,
+                    shift=0)
+
+    def __init__(self, p0, p1, **options):
+        super().__init__(p0, p1, **options)
+        self.set_class_options(options)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        center = pos + self.pos + self.size//2
+        axes = self.size//2
+        cv.ellipse(self.img, tuple(center), tuple(axes), **self.options)
+
+
+class Polygon(Node):
+    options = dict( isClosed=True,
+                    color=MAGENTA,
+                    thickness=1,
+                    lineType=cv.LINE_8,
+                    shift=0)
+
+    def __init__(self, pts, **options):
+        super().__init__(**options)
+        self.set_class_options(options)
+        self.set_pos_size(pts)
+
+    def draw(self, pos=np.array((0, 0))):
+        super().draw(pos)
+        pts = pos + self.pos + self.pts
+        cv.polylines(self.img, [pts], **self.options)
+
+
+class Text(Node):
     options = dict(fontFace=cv.FONT_HERSHEY_SIMPLEX,
                    fontScale=1,
                    color=GREEN,
@@ -129,8 +266,8 @@ class TextNode(Node):
 
     def __init__(self, text='TextNode', **options):
         super().__init__(**options)
+        self.set_class_options(options)
         self.text = text
-        self.options = TextNode.options
         (w, h), b = self.get_size()
         self.size = np.array((w, h+b))
 
@@ -156,64 +293,6 @@ class TextNode(Node):
             self.text += k
         (w, h), b = self.get_size()
         self.size = w, h+b
-
-
-class Marker(Node):
-    options = dict( color=GREEN,
-                    markerType=cv.MARKER_CROSS,
-                    markerSize=20,
-                    thickness=1,
-                    line_type=8)
-
-    def __init__(self, **options):
-        super().__init__(**options)
-        self.set_class_options(options)
-        
-        self.size = np.array((20, 20))
-        self.frame = False
-        cv.imshow(self.win.win, self.img)
-
-    def draw(self, pos=np.array((0, 0))):
-        super().draw(pos)
-        x, y = pos + self.pos + (10, 10)
-        cv.drawMarker(self.img, (x, y), **self.options)
-
-class Line(Node):
-    options = dict( color=GREEN,
-                    thickness=1,
-                    lineType=cv.LINE_8,
-                    shift=0)
-
-    def __init__(self):
-        super().__init__(**options)
-        self.set_class_options(options)
-
-
-class Arrow(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Rectangle(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Circle(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Ellipse(Node):
-    def __init__(self):
-        super().__init__()
-
-
-class Polygon(Node):
-    def __init__(self):
-        super().__init__()
-
-
 
 
 class Button(Node):
@@ -370,12 +449,12 @@ class App:
                           'i': self.inspect,
                           'w': Window,
                           'n': Node,
-                          't': TextNode,
+                          't': Text,
                           'b': Button,
                           'l': Listbox,
                           'e': self.edit_mode }
 
-        self.classes = [Marker, Line, Arrow, Rectangle, Node, TextNode]
+        self.classes = [Marker, Line, Arrow, Rectangle, Node, Text]
         self.class_id = 0
         self.new = Marker
 
