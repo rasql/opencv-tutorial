@@ -215,3 +215,83 @@ diagonal directions::
 .. autoclass:: node7.Demo
 
 .. image:: node7.*
+
+Toggle frames
+-------------
+
+Displaying frames is mostly needed for understanging the node frame structure,
+and during debugging. It is convenient to turn it off or on either the window level
+or the node level. For this we create a new Window instance attribute::
+
+    self.frame = True
+
+and a Node instance attribute::
+
+    self.frame = True
+
+Inside the Node :meth:`draw` method we are using both flags::
+
+    if self.win.frame and self.frame:
+        cv.rectangle(self.img, (x, y, w, h), RED, 1)
+        label = 'n{}'.format(self.id)
+        cv.putText(self.img, label, (x, y-1), 0, 0.4, RED, 1)
+
+Inside the Window class we define a new method to toggle the flag::
+
+    def toggle_frame(self):
+        self.frame = not self.frame
+
+Finally we add a new shortcut to the Window class::
+
+       self.shortcuts = {'\t': self.select_next_node,
+                          chr(27): self.unselect_node,
+                          chr(0): self.toggle_shift,
+                          'f': self.toggle_frame }
+
+Nodes based on points
+---------------------
+
+We are going to create a new Node class which is defined by a list of points.
+
+Executing commands when clicking a node
+---------------------------------------
+
+In order to react to a mouse click inside a node, we add a **cmd** 
+attribute. There are several places to modify. First we add it to the default 
+node options in the Window class::
+
+  node_options = dict(pos=np.array((20, 20)),
+                        size=np.array((100, 20)),
+                        ...
+                        cmd=None)
+
+Then we add a new attribute in the Node class::
+
+        self.cmd = options.get('cmd', None)
+
+and finally we call it in the **mouse** callback method::
+
+    def mouse(self, event, pos, flags, param):
+        if event == cv.EVENT_LBUTTONDOWN:
+            self.cmd()
+            for child in self.children:
+                child.selected=False
+                if child.is_inside(pos-self.pos):
+                    child.selected=True
+                    child.cmd()
+
+The following example we association three callback functions to three nodes:
+
+* nodo 0 - prints the help menu
+* node 1 - toggles visibility
+* node 2 - creates a new Text instance
+
+This is the code::
+
+        Node(cmd=help)
+        Node(cmd=App.win.toggle_visible)
+        Node(cmd=Text)
+
+.. autoclass:: node11.Demo
+
+.. image:: node11.*

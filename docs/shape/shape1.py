@@ -9,7 +9,7 @@ class Demo(App):
         markers = cv_dir('MARKER.*')
 
         for marker in markers:
-            TextNode(marker, fontScale=0.5, thickness=1)
+            Text(marker, fontScale=0.5, thickness=1)
 
         for m in range(7):
             Marker(pos=(300, m*25+20), markerType=m)

@@ -9,7 +9,7 @@ class Demo(App):
 
         Node(level=1)
         Node()
-        TextNode('Text Node')
+        Text('Text Node')
 
         Node(level=-1, dir=(1, 0))
         Node(level= 1, size=(200, 30))

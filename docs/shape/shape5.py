@@ -6,7 +6,7 @@ class Demo(App):
         super().__init__()
 
         Window()
-        TextNode('Ellipse')
+        Text('Ellipse')
 
         Ellipse((200, 100), (200, 30))
 

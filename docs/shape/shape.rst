@@ -38,8 +38,8 @@ We use it to find the markers
  'MARKER_TRIANGLE_UP']
 
 
-Markers
--------
+Marker
+------
 
 We base the Marker class on the Node class. At first we set the options as 
 class attribute of the Marker class::
@@ -79,8 +79,8 @@ Finally we create the :meth:`draw` method::
 .. image:: shape1.png
 
 
-Lines
------
+Line
+----
 
 When creating the :class:`Line` we first define the default options 
 as **class attribute**::
@@ -134,8 +134,8 @@ The demo program draws 10 randomly positioned lines::
 .. image:: shape2.png
 
 
-Arrows
-------
+Arrow
+-----
 
 All the next few classes are easy to implement. They all can be subclassed from 
 :class:`Node2`. 
@@ -182,8 +182,8 @@ The demo program draws 10 randomly positioned lines::
 .. image:: shape3.*
 
 
-Rectangles
-----------
+Rectangle
+---------
 
 The rectangle class is similar to the Arrow and Line class::
 
@@ -217,8 +217,8 @@ As demo example we print 10 random ellipses.
 
 .. image:: shape5.*
 
-Polygons
---------
+Polygon
+-------
 
 As demo example we print 3 random polygons with 5 vertices.
 

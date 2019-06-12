@@ -6,7 +6,7 @@ class Demo(App):
         super().__init__()
 
         Window()
-        TextNode('Arrows')
+        Text('Arrows')
 
         for i in range(10):
             col = random.choice([RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA, WHITE])
