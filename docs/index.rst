@@ -12,7 +12,7 @@ Welcome to the OpenCV tutorial
 
    intro/intro
    app/app
-   draw/draw
+   node/node
    shape/shape
    widget/widget
 

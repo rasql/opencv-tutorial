@@ -4,8 +4,6 @@ from cvlib import *
 class Demo(App):
     def __init__(self):
         super().__init__()
-
-        Window()
         
         for i in range(5):
             Node(dir=(1, 0), size=(20, 20))

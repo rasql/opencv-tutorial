@@ -16,8 +16,7 @@ Classes:
 * Entry
 * Combobox
 * Listbox
-* Rectangle, Circle, Ellipse, Polygon
-* Line, Arrow, Marker
+
 
 Warning
 
@@ -25,6 +24,9 @@ Warning
 
 * window name such as imshow(win, img)
 * Window class reference such as Object.win
+
+* Unit testing
+* creating diagrams with draw.io (app-win-nodes)
 
 Links:
 

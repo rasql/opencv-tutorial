@@ -25,29 +25,31 @@ def help():
 
 class Node:
     """Create a tree node to add graphic objects to a window."""
-    options = dict( pos=np.array((20, 20)),
-                    size=np.array((100, 20)),
-                    gap=np.array((10, 10)),
-                    dir=np.array((0, 1)),)
-
+ 
     def __init__(self, level=0, **options):
+        if App.win == None:
+            Window()
         self.win = App.win
         self.img = App.win.img
 
         # set Node class options
         self.set_node_options(options)
 
-        # select parent node
-        if level == -1:
-            self.level_up()
-        elif level == +1:
-            parent = self.win.stack[-1].children[-1]
-            Node.options['pos'] = Node.options['gap']
-            self.win.stack.append(parent)
+        # select insertion (parent) node
+        if level == 0:
+            self.parent = self.win.current_parent
+        elif level == 1:
+            self.parent = self.win.current_parent.children[-1]
+            self.win.current_parent = self.parent
+        else:
+            for i in range(-level):
+                self.win.current_parent.enclose_children()
+                self.parent = self.win.current_parent.parent
+                self.win.current_parent = self.parent
 
-        # attach node to parent
-        self.parent = self.win.stack[-1]
+        # set attributes
         self.parent.children.append(self)
+        self.win.nodes.append(self)
         self.children = []
         self.selected = False
         self.frame = True
@@ -57,12 +59,15 @@ class Node:
         self.size = None
         self.gap = None
         self.dir = None
+        self.id = None
 
         # update instance attributes from node options
         self.__dict__.update(Node.options)
+        Node.options['id'] += 1
 
-        pos = self.pos + (self.size+self.gap)*self.dir
-        Node.options['pos'] = pos
+        if 'pos' not in options:
+            self.set_pos()
+
         # cv.imshow(self.win.win, self.img)
 
     def __str__(self):
@@ -85,27 +90,19 @@ class Node:
         self.options = self.__class__.options.copy()
 
 
-    def level_up(self):
-        """Enclose the current children and move up one level."""
-        n = self.win.stack[-1]
-        n.enclose_children()
-
-        # update the position
-        pos = n.pos + (n.size+n.gap)*n.dir
-        self.win.node_options['pos'] = pos
-        self.win.stack.pop()
-
     def draw(self, pos=np.array((0, 0))):
 
         x, y = pos + self.pos
         w, h = self.size
         if self.frame:
             cv.rectangle(self.img, (x, y, w, h), RED, 1)
+            label = 'n{}'.format(self.id)
+            cv.putText(self.img, label, (x, y-1), 0, 0.4, RED, 1)
         if self.selected:
             cv.rectangle(self.img, (x-2, y-2, w+4, h+4), GREEN, 1)
 
         for child in self.children:
-            child.draw(self.pos)
+            child.draw(pos+self.pos)
 
     def is_inside(self, pos):
         """Check if the point (x, y) is inside the object."""
@@ -133,6 +130,15 @@ class Node:
         self.pts = pts-min
         self.pos = min
         self.size = max-min
+
+    def set_pos(self):
+        """Set the new position based on preceding sibling."""
+        if len(self.parent.children) == 1:  # is first child
+            self.pos = self.gap
+        else:
+            prev = self.parent.children[-2]  # preceding sibling
+            self.pos = prev.pos + self.dir * (prev.size + self.gap)
+
 
 class Node2(Node):
     """Node based on two points (p0, p1)."""
@@ -319,16 +325,19 @@ class Window:
                         size=np.array((100, 20)),
                         gap=np.array((10, 10)),
                         dir=np.array((0, 1)),
+                        id=0,
                         )
 
     def __init__(self, win=None, img=None):
         App.wins.append(self)
         App.win = self
 
-        self.node_options = Window.node_options.copy()
+        Node.options = Window.node_options.copy()
         self.children = []  # children
-        self.stack = [self]  #  parent stack
+        self.current_parent = self  # inital parent
+        self.nodes = []  # list of all nodes
         self.node = None  # currently selected node
+        self.pos = np.array((0, 0))
 
         if img == None:
             img = np.zeros((200, 600, 3), np.uint8)

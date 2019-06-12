@@ -79,8 +79,8 @@ Finally we create the :meth:`draw` method::
 .. image:: shape1.png
 
 
-Creating the Line class
------------------------
+Lines
+-----
 
 When creating the :class:`Line` we first define the default options 
 as **class attribute**::
@@ -134,8 +134,8 @@ The demo program draws 10 randomly positioned lines::
 .. image:: shape2.png
 
 
-Creating the Arrow class
-------------------------
+Arrows
+------
 
 All the next few classes are easy to implement. They all can be subclassed from 
 :class:`Node2`. 
@@ -182,8 +182,8 @@ The demo program draws 10 randomly positioned lines::
 .. image:: shape3.*
 
 
-Creating the Arrow class
-------------------------
+Rectangles
+----------
 
 The rectangle class is similar to the Arrow and Line class::
 
@@ -208,8 +208,8 @@ As demo example we print 10 random rectangles.
 .. image:: shape4.*
 
 
-Ellipse
--------
+Ellipses
+--------
 
 As demo example we print 10 random ellipses.
 
@@ -217,8 +217,8 @@ As demo example we print 10 random ellipses.
 
 .. image:: shape5.*
 
-Polygon
--------
+Polygons
+--------
 
 As demo example we print 3 random polygons with 5 vertices.
 

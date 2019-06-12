@@ -5,6 +5,23 @@ In this section we are going to create an application from zero.
 Our goal to establish a general framework which can be the basis 
 for different kinds of applications, such as editors, browsers or video games.
 
+The image below shows an schematic of how an app works. The app is the overall
+place where keyboard and mouse input is detected. An app can open one or several 
+windows. Only one is the active window at any given time. To make a window the
+active window, one has to click with the mouse in it. Each window has several objects.
+These objects are organized as hierarchical nodes. Each window can have one
+active node. 
+The keyboard events are sent from the application to the active window, and from the active
+window to the active node (node, widget, or shape). 
+
+A Text node can use keyboard input to edit the widget. If there is no active node, then
+the window can use the keyboard input as shortcuts. If neither an active node,
+nor the window handles the keyboard event, it falls back to the application, which 
+can handle it.
+
+.. image:: gui.*
+
+
 We start by importing the **OpenCV** and the **numpy** module and give
 them the usual abbreviations::
 
