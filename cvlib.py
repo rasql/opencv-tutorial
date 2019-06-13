@@ -1,6 +1,10 @@
 import cv2 as cv
 import numpy as np
-import os, re, sys, math, random
+import os
+import re
+import sys
+import math
+import random
 
 BLACK = (0, 0, 0)
 RED = (0, 0, 255)
@@ -25,7 +29,7 @@ def help():
 
 class Node:
     """Create a tree node to add graphic objects to a window."""
- 
+
     def __init__(self, **options):
         if App.win == None:
             Window()
@@ -70,7 +74,7 @@ class Node:
         if 'pos' not in options:
             self.set_pos()
 
-        # cv.imshow(self.win.win, self.img)
+        self.win.draw()
 
     def __str__(self):
         obj = self.__class__.__name__
@@ -83,7 +87,7 @@ class Node:
                 if isinstance(v, tuple):
                     v = np.array(v)
                 Node.options[k] = v
- 
+
     def set_class_options(self, options):
         """Update class options and set instance options."""
         for k, v in options.items():
@@ -98,7 +102,6 @@ class Node:
                 msg = spec.format(k, cname, options)
                 raise TypeError(msg)
         self.options = self.__class__.options.copy()
-
 
     def draw(self, pos=np.array((0, 0))):
 
@@ -124,11 +127,10 @@ class Node:
             if callable(self.cmd):
                 self.cmd()
             for child in self.children:
-                child.selected=False
+                child.selected = False
                 if child.is_inside(pos-self.pos):
-                    child.selected=True
+                    child.selected = True
                     child.mouse(event, pos, flags, param)
-
 
     def key(self, k):
         print('key', k, 'in', self)
@@ -149,7 +151,7 @@ class Node:
         """Set position and size from the list of points."""
         min = np.amin(pts, axis=0)
         max = np.amax(pts, axis=0)
-        
+
         self.pts = pts-min
         self.pos = min
         self.size = max-min
@@ -166,13 +168,14 @@ class Node:
 
 class Node2(Node):
     """Node based on multiple points."""
+
     def __init__(self, *pts, **options):
         super().__init__(**options)
 
         n = len(pts)
         if n == 0:
             pts = [self.pos, self.pos+self.size]
-        
+
         self.pts = np.array(pts)
         self.set_pos_size(self.pts)
 
@@ -182,27 +185,27 @@ class Node2(Node):
             self.size = np.array((20, 20))
 
         # print(self.pts, *self.pts[:2])
-            
+
     def draw(self, pos=np.array((0, 0))):
         super().draw(pos)
         self.pts_ = pos + self.pos + self.pts  # abs position
         if self.win.frame and self.frame:
             for p in self.pts_:
-                cv.drawMarker(self.img, tuple(p), RED, markerSize=10, 
-                    markerType=cv.MARKER_SQUARE)
+                cv.drawMarker(self.img, tuple(p), RED, markerSize=10,
+                              markerType=cv.MARKER_SQUARE)
 
 
 class Marker(Node):
-    options = dict( color=GREEN,
-                    markerType=cv.MARKER_CROSS,
-                    markerSize=20,
-                    thickness=1,
-                    line_type=cv.LINE_8)
+    options = dict(color=GREEN,
+                   markerType=cv.MARKER_CROSS,
+                   markerSize=20,
+                   thickness=1,
+                   line_type=cv.LINE_8)
 
     def __init__(self, **options):
         super().__init__(**options)
         self.set_class_options(options)
-        
+
         self.size = np.array((20, 20))
         self.frame = False
         cv.imshow(self.win.win, self.img)
@@ -214,38 +217,40 @@ class Marker(Node):
 
 
 class Line(Node2):
-    options = dict( color=GREEN,
-                    thickness=1,
-                    lineType=cv.LINE_8,
-                    shift=0)
+    options = dict(color=GREEN,
+                   thickness=1,
+                   lineType=cv.LINE_8,
+                   shift=0)
 
     def draw(self, pos=np.array((0, 0))):
         super().draw(pos)
         p = pos + self.pos + self.pts
         cv.line(self.img, tuple(p[0]), tuple(p[1]), **self.options)
-                        
-    
+
+
 class Arrow(Node2):
-    options = dict( color=RED,
-                    thickness=1,
-                    line_type=cv.LINE_8,
-                    shift=0,
-                    tipLength=0.1)
-                    
+    options = dict(color=RED,
+                   thickness=1,
+                   line_type=cv.LINE_8,
+                   shift=0,
+                   tipLength=0.1)
+
     def draw(self, pos=np.array((0, 0))):
         super().draw(pos)
-        cv.arrowedLine(self.img, tuple(self.pts_[0]), tuple(self.pts_[1]), **self.options)
+        cv.arrowedLine(self.img, tuple(self.pts_[0]), tuple(
+            self.pts_[1]), **self.options)
 
 
 class Rectangle(Node2):
-    options = dict( color=GREEN,
-                    thickness=1,
-                    lineType=cv.LINE_8,
-                    shift=0)
+    options = dict(color=GREEN,
+                   thickness=1,
+                   lineType=cv.LINE_8,
+                   shift=0)
 
     def draw(self, pos=np.array((0, 0))):
         super().draw(pos)
-        cv.rectangle(self.img, tuple(self.pts_[0]), tuple(self.pts_[1]), **self.options)
+        cv.rectangle(self.img, tuple(self.pts_[0]), tuple(
+            self.pts_[1]), **self.options)
 
 
 class Circle(Node):
@@ -254,13 +259,13 @@ class Circle(Node):
 
 
 class Ellipse(Node2):
-    options = dict( angle=0,
-                    startAngle=0,
-                    endAngle=360,
-                    color=RED,
-                    thickness=1,
-                    lineType=cv.LINE_8,
-                    shift=0)
+    options = dict(angle=0,
+                   startAngle=0,
+                   endAngle=360,
+                   color=RED,
+                   thickness=1,
+                   lineType=cv.LINE_8,
+                   shift=0)
 
     def __init__(self, p0, p1, **options):
         super().__init__(p0, p1, **options)
@@ -274,11 +279,11 @@ class Ellipse(Node2):
 
 
 class Polygon(Node2):
-    options = dict( isClosed=True,
-                    color=MAGENTA,
-                    thickness=1,
-                    lineType=cv.LINE_8,
-                    shift=0)
+    options = dict(isClosed=True,
+                   color=MAGENTA,
+                   thickness=1,
+                   lineType=cv.LINE_8,
+                   shift=0)
 
     def draw(self, pos=np.array((0, 0))):
         super().draw(pos)
@@ -332,14 +337,14 @@ class Button(Node):
 
 
 class Listbox(Node):
-    options=dict(   fontScale=0.5, thickness=1)
+    options = dict(fontScale=0.5, thickness=1)
 
     def __init__(self, items='Item1;Item2;Item3', **options):
         if isinstance(items, str):
             items = items.split(';')
         self.items = items
 
-        options.update( dict(gap=np.array((0, 0))) )
+        options.update(dict(gap=np.array((0, 0))))
         super().__init__(**options)
 
         Text(self.items[0], level=1, thickness=1, fontScale=0.5, cmd=self.cb)
@@ -391,7 +396,7 @@ class Window:
                           chr(27): self.unselect_node,
                           chr(0): self.toggle_shift,
                           'f': self.toggle_frame,
-                          'v': self.toggle_visible }
+                          'v': self.toggle_visible}
 
         cv.imshow(win, img)
         cv.setMouseCallback(win, self.mouse)
@@ -408,11 +413,11 @@ class Window:
 
         if event == cv.EVENT_LBUTTONDOWN:
             App.win = self
-            
+
             if flags & cv.EVENT_FLAG_SHIFTKEY:
                 self.new(pos=(x, y))
             else:
-                self.select_node(x, y)
+                self.select_node(pos)
 
         if event == cv.EVENT_MOUSEMOVE:
             if flags == cv.EVENT_FLAG_ALTKEY and self.node != None:
@@ -449,12 +454,12 @@ class Window:
 
         cv.imshow(self.win, self.img)
 
-    def select_node(self, x, y):
+    def select_node(self, pos):
         """Select oblect at position (x, y)."""
         self.node = None
         for child in self.children:
             child.selected = False
-            if child.is_inside((x, y)):
+            if child.is_inside(pos):
                 child.selected = True
                 self.node = child
 
@@ -514,7 +519,7 @@ class App:
                           't': Text,
                           'b': Button,
                           'l': Listbox,
-                          'e': self.edit_mode }
+                          'e': self.edit_mode}
 
         self.classes = [Marker, Line, Arrow, Rectangle, Node, Text]
         self.class_id = 0
@@ -535,7 +540,11 @@ class App:
     def inspect(self):
         print('--- INSPECT ---')
         print('App.wins', App.wins)
-        print('App.win', App.win)
+        # print('App.win', App.win)
+        if App.win.node != None:
+            d = vars(App.win.node)
+            d.pop('img')
+            print(d)
 
     def edit_mode(self):
         self.class_id += 1
@@ -544,6 +553,7 @@ class App:
         print(App.win.new)
         text = 'Insert new {}'.format(App.win.new.__name__)
         cv.displayStatusBar(App.win.win, text, 1000)
+
 
 if __name__ == '__main__':
     App().run()

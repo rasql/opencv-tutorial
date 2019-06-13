@@ -5,9 +5,13 @@ class Demo(App):
     def __init__(self):
         super().__init__()
 
-        Node(cmd=help)
-        Node(cmd=App.win.toggle_visible)
-        Node(cmd=Text)
+        Node()
+        Node(level=1)
+        Node(level=1)
+        Node(level=1)
+        Node(level=-1)
+        Node(level=-1)
+        Node(level=-1)
 
 if __name__ == '__main__':
     Demo().run()

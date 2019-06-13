@@ -6,10 +6,10 @@ to create widgets and shapes. Nodes are the elements of a tree graph.
 Each window is a root of the tree and can have multiple nodes as children.
 Nodes can have children of their own.
 
-Widgets are user control items such as text fields, buttons, comboboxes, 
-entry fields, and listboxes. 
+Widgets are user control items such as text fields, buttons, comboboxes,
+entry fields, and listboxes.
 
-Shapes are the geometrical formes such as markers, lines, arrows, 
+Shapes are the geometrical formes such as markers, lines, arrows,
 rectangles, circles, ellipses and polygones.
 
 .. autoclass:: node1.Demo
@@ -27,8 +27,8 @@ Each node has 4 attributes (options):
 * direction towards the next object
 
 The Node options are reset at the creation of a new window. They
-are in the format of **numpy** int64 arrays. The advantage of using 
-numpy arrays is that we can do vector addition. For example the 
+are in the format of **numpy** int64 arrays. The advantage of using
+numpy arrays is that we can do vector addition. For example the
 lower right corner is simply::
 
     p1 = pos + size
@@ -50,14 +50,15 @@ When creating a new window, the initial node options are reassigned::
 Parents and children
 --------------------
 
-The window is the parent of the first-level children. At window creation an empty
-children list is created::
+The window is the parent of the first-level children. At window creation an
+empty children list is created::
 
         self.children = []  # children
 
-At that point the window is the parent of the children to add. Parents are stored
-in a stack. Initialy the window is the parent for the first-level children. So at
-window creation, the window itself is added to the parent stack::
+At that point the window is the parent of the children to add. Parents are
+stored in a stack. Initialy the window is the parent for the first-level
+children.
+So at window creation, the window itself is added to the parent stack::
 
         self.stack = [self]  #  parent stack
 
@@ -82,7 +83,7 @@ level = -1
 Enclosing nodes
 ---------------
 
-The following exemple shows a first node, folloed by 3 nodes at a child 
+The following exemple shows a first node, folloed by 3 nodes at a child
 level, then 4 nodes at the parent level, with a change of direction::
 
     class Demo(App):
@@ -103,7 +104,7 @@ level, then 4 nodes at the parent level, with a change of direction::
 .. image:: node2.*
 
 In the next example node 6 increases level again, and changes
-direction to vertical. The parent of the last nodes is forced to 
+direction to vertical. The parent of the last nodes is forced to
 enclcose its children::
 
         Node()
@@ -136,7 +137,7 @@ embedded in node 0, node 3 and 4 is embedded in node 2. This is the code::
 
 .. image:: node4.*
 
-In the following example, we go down 3 levels: 
+In the following example, we go down 3 levels:
 
 * node 1 is embedded in node 0
 * node 2 is embedded in node 1
@@ -173,7 +174,8 @@ This is the code::
         self.parent = self.win.current_parent.parent
         self.win.current_parent = self.parent
 
-Here is the previous example where we go up 3 levels at once, instead of one by one::
+Here is the previous example where we go up 3 levels at once,
+instead of one by one::
 
     Node()
     Node(level=1)
@@ -197,7 +199,7 @@ New nodes are placed according to the direction `dir` vector. This can be:
 * horizontal (1, 0)
 * diagonal (1, 1)
 
-Here is an example of 5 nodes placed in vertical, horizontal and two 
+Here is an example of 5 nodes placed in vertical, horizontal and two
 diagonal directions::
 
     for i in range(5):
@@ -220,8 +222,9 @@ Toggle frames
 -------------
 
 Displaying frames is mostly needed for understanging the node frame structure,
-and during debugging. It is convenient to turn it off or on either the window level
-or the node level. For this we create a new Window instance attribute::
+and during debugging. It is convenient to turn it off or on either
+the window level or the node level.
+For this we create a new Window instance attribute::
 
     self.frame = True
 
@@ -256,8 +259,8 @@ We are going to create a new Node class which is defined by a list of points.
 Executing commands when clicking a node
 ---------------------------------------
 
-In order to react to a mouse click inside a node, we add a **cmd** 
-attribute. There are several places to modify. First we add it to the default 
+In order to react to a mouse click inside a node, we add a **cmd**
+attribute. There are several places to modify. First we add it to the default
 node options in the Window class::
 
   node_options = dict(pos=np.array((20, 20)),
