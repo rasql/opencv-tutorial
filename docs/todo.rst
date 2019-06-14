@@ -32,3 +32,11 @@ Links:
 
 * https://docs.quantifiedcode.com/python-anti-patterns/ 
 * https://pymbook.readthedocs.io/en/latest/ 
+* Date structures and algorithmes with Python,
+    http://knuth.luther.edu/~leekent/CS2Plus/index.html
+* Python 3 - Patterns, Recipes and Idioms,
+    https://python-3-patterns-idioms-test.readthedocs.io/en/latest/index.html
+* Any Python Tree Data
+    https://anytree.readthedocs.io/en/latest/
+
+
