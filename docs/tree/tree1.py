@@ -10,7 +10,6 @@ Node(parent=n2)
 print(Node.nodes)
 n.print_tree()
 
-
 for i in range(5):
     n2 = n2.sibling()
     print(n)

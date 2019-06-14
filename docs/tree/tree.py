@@ -39,7 +39,9 @@ class Node:
     def walk(self):
         if children != []:
             children[0]
-        else 
+        else:
+            pass
+            # TO DO
         
 if __name__ == '__main__':
     n = Node()

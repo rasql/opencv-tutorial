@@ -1,7 +1,7 @@
 Features to add:
 ================
 
-Nodes 
+Nodes
 
 * editable
 * visible
@@ -30,8 +30,8 @@ Warning
 
 Links:
 
-* https://docs.quantifiedcode.com/python-anti-patterns/ 
-* https://pymbook.readthedocs.io/en/latest/ 
+* https://docs.quantifiedcode.com/python-anti-patterns/
+* https://pymbook.readthedocs.io/en/latest/
 * Date structures and algorithmes with Python,
     http://knuth.luther.edu/~leekent/CS2Plus/index.html
 * Python 3 - Patterns, Recipes and Idioms,
