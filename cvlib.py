@@ -170,7 +170,7 @@ class Node2(Node):
     """Node based on multiple points."""
 
     def __init__(self, *pts, **options):
-        super().__init__(**options)
+        # super().__init__(**options)
 
         n = len(pts)
         if n == 0:
@@ -184,6 +184,7 @@ class Node2(Node):
             self.pts += np.array((10, 10))
             self.size = np.array((20, 20))
 
+        super().__init__(**options)
         # print(self.pts, *self.pts[:2])
 
     def draw(self, pos=np.array((0, 0))):
@@ -191,8 +192,12 @@ class Node2(Node):
         self.pts_ = pos + self.pos + self.pts  # abs position
         if self.win.frame and self.frame:
             for p in self.pts_:
-                cv.drawMarker(self.img, tuple(p), RED, markerSize=10,
-                              markerType=cv.MARKER_SQUARE)
+                pos = tuple(p)
+                print(pos)
+
+                # cv.drawMarker(self.img, pos, color=RED, markerSize=10,
+                #               markerType=cv.MARKER_SQUARE)
+                cv.drawMarker(self.img, pos, RED)
 
 
 class Marker(Node):
@@ -299,9 +304,10 @@ class Text(Node):
                    bottomLeftOrigin=False)
 
     def __init__(self, text='Text', **options):
+        self.text = text
         super().__init__(**options)
         self.set_class_options(options)
-        self.text = text
+        # self.text = text
         (w, h), b = self.get_size()
         self.size = np.array((w, h+b))
 
