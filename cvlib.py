@@ -27,7 +27,7 @@ def help():
     print('--- HELP ---')
 
 
-class Node:
+class Shape:
     """Create a tree node to add graphic objects to a window."""
 
     def __init__(self, **options):
@@ -39,7 +39,7 @@ class Node:
         level = options.get('level', 0)
         self.cmd = options.get('cmd', None)
 
-        # set Node class options
+        # set Shape class options
         self.set_node_options(options)
         self.set_class_options(options)
 
@@ -68,8 +68,8 @@ class Node:
         self.id = None
 
         # update instance attributes from node options
-        self.__dict__.update(Node.options)
-        Node.options['id'] += 1
+        self.__dict__.update(Shape.options)
+        Shape.options['id'] += 1
 
         if 'pos' not in options:
             self.set_pos()
@@ -81,19 +81,19 @@ class Node:
         return '{} at {}'.format(obj, self.pos)
 
     def set_node_options(self, options):
-        """Update Node class options."""
+        """Update Shape class options."""
         for k, v in options.items():
-            if k in Node.options:
+            if k in Shape.options:
                 if isinstance(v, tuple):
                     v = np.array(v)
-                Node.options[k] = v
+                Shape.options[k] = v
 
     def set_class_options(self, options):
         """Update class options and set instance options."""
         for k, v in options.items():
             if k in self.__class__.options:
                 self.__class__.options[k] = v
-            elif k in Node.options:
+            elif k in Shape.options:
                 pass
             else:
                 cname = self.__class__.__name__
@@ -166,8 +166,8 @@ class Node:
             self.pos = prev.pos + self.dir * (prev.size + self.gap)
 
 
-class Node2(Node):
-    """Node based on multiple points."""
+class Node2(Shape):
+    """Shape based on multiple points."""
 
     def __init__(self, *pts, **options):
         # super().__init__(**options)
@@ -200,7 +200,7 @@ class Node2(Node):
                 cv.drawMarker(self.img, pos, RED)
 
 
-class Marker(Node):
+class Marker(Shape):
     options = dict(color=GREEN,
                    markerType=cv.MARKER_CROSS,
                    markerSize=20,
@@ -258,7 +258,7 @@ class Rectangle(Node2):
             self.pts_[1]), **self.options)
 
 
-class Circle(Node):
+class Circle(Shape):
     def __init__(self):
         super().__init__()
 
@@ -295,7 +295,7 @@ class Polygon(Node2):
         cv.polylines(self.img, [self.pts_], **self.options)
 
 
-class Text(Node):
+class Text(Shape):
     options = dict(fontFace=cv.FONT_HERSHEY_SIMPLEX,
                    fontScale=1,
                    color=GREEN,
@@ -335,14 +335,14 @@ class Text(Node):
         self.size = w, h+b
 
 
-class Button(Node):
+class Button(Shape):
     def __init__(self, text='Button', cmd=None):
         super().__init__()
         Text(text, level=1, cmd=cmd)
         self.goto_parent()
 
 
-class Listbox(Node):
+class Listbox(Shape):
     options = dict(fontScale=0.5, thickness=1)
 
     def __init__(self, items='Item1;Item2;Item3', **options):
@@ -376,7 +376,7 @@ class Window:
         App.wins.append(self)
         App.win = self
 
-        Node.options = Window.node_options.copy()
+        Shape.options = Window.node_options.copy()
         self.children = []  # children
         self.current_parent = self  # inital parent
         self.nodes = []  # list of all nodes
@@ -521,13 +521,13 @@ class App:
         self.shortcuts = {'h': help,
                           'i': self.inspect,
                           'w': Window,
-                          'n': Node,
+                          'n': Shape,
                           't': Text,
                           'b': Button,
                           'l': Listbox,
                           'e': self.edit_mode}
 
-        self.classes = [Marker, Line, Arrow, Rectangle, Node, Text]
+        self.classes = [Marker, Line, Arrow, Rectangle, Shape, Text]
         self.class_id = 0
         self.new = Marker
 
@@ -562,4 +562,6 @@ class App:
 
 
 if __name__ == '__main__':
-    App().run()
+    app = App()
+    Winwdow()   
+    app.run()

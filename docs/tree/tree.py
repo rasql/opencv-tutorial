@@ -15,7 +15,7 @@ class Node:
         parent = 0 (same level, sibling to last)
         parent = -1 (level decrease, oncle to last)
         """
-        
+
         if Node.id == 0:
             self.parent = None
             Node.path = [self]
@@ -120,8 +120,8 @@ if __name__ == '__main__':
 
     root.print_tree()
 
-for n in root.get_breadth_first_nodes():
-    print(n)
+    for n in root.get_breadth_first_nodes():
+        print(n)
     
     
 
