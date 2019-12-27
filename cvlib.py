@@ -26,13 +26,125 @@ def cv_dir(regex):
 def help():
     print('--- HELP ---')
 
+class Node:
+    """Create a basic node for a tree structure."""
+    id = 0
+    sep = '/'
+    nodes = []
+    path = []
+    
+    def __init__(self, parent=0, children=[]):
+        """Create a node.
+        parent = None (root)
+        parent = Node()
+        parent = 1 (increase level, node is child of last)
+        parent = 0 (same level, node is sibling of last)
+        parent = -1 (level decrease, node is oncle to last)
+        """
 
-class Shape:
-    """Create a tree node to add graphic objects to a window."""
+        if Node.id == 0:
+            self.parent = None
+            Node.path = [self]
+        elif isinstance(parent, int):
+            if parent == 1:
+                self.parent = Node.path[-1]
+            else:
+                self.parent = Node.path[-2+parent]
+                Node.path = Node.path[:-1+parent]
+            Node.path.append(self)
+        else:
+            self.parent = parent
+            Node.path = parent.get_path()
+
+        self.children = []
+        
+        if self.parent != None:
+            self.parent.children.append(self)
+
+        self.id = Node.id
+        Node.id += 1
+        Node.nodes.append(self)
+        print(self, self.parent)
+        return self
+
+    def __str__(self):
+        return 'node{}'.format(self.id)
+        
+    def print_tree(self, level=0):
+        """Print a tree view."""
+        print('    ' * level + str(self))
+        level += 1
+        for child in self.children:
+            child.print_tree(level)
+
+    def sibling(self, forward=True, wrap=True):
+        d = 1 if forward else -1
+        n = len(self.parent.children)
+        i = self.parent.children.index(self)
+        if wrap:
+            i = (i+d) % n
+        else:
+            i = max(0, min(i+d, n-1))
+        return self.parent.children[i]
+
+    def is_root(self):
+        return self.parent == None
+
+    def walk(self, i=0):
+        print(self)
+        if i < len(self.children):
+            walk(self.children[i], 0)
+        else:
+            walk(self)
+              # TO 
+    def get_breadth_first_nodes(self):
+        """Get breath-first nodes."""
+        nodes = []
+        stack = [self]
+        while stack:
+            n0 = stack.pop(0)
+            nodes.append(n0)
+            stack.extend(n0.children)
+        return nodes
+
+    def get_depth_first_nodes(self):
+        """Get depth-first nodes."""
+        nodes = []
+        stack = [self]
+        while stack:
+            n0 = stack.pop(0)
+            nodes.append(n0)
+            stack = n0.children + stack
+        return nodes
+
+    def get_path(node):
+        """Return path list including node."""
+        path = []
+        while node != None:
+            path.insert(0, node)
+            node = node.parent
+        return path
+
+class Shape(Node):
+    """Create a shape node to add graphic objects to a window.
+    * parent
+    * children
+    * id
+
+    * win
+    * img
+
+    * pos
+    * size
+    * dir
+    * gap
+    """
 
     def __init__(self, **options):
         if App.win == None:
             Window()
+        super().__init__(App.win)  # Create child of current window
+
         self.win = App.win
         self.img = App.win.img
 
@@ -53,10 +165,6 @@ class Shape:
             for i in range(-level):
                 self.goto_parent()
 
-        # set attributes
-        self.parent.children.append(self)
-        self.win.nodes.append(self)
-        self.children = []
         self.selected = False
         self.frame = True
 
@@ -76,9 +184,9 @@ class Shape:
 
         self.win.draw()
 
-    def __str__(self):
-        obj = self.__class__.__name__
-        return '{} at {}'.format(obj, self.pos)
+    # def __str__(self):
+    #     obj = self.__class__.__name__
+    #     return '{} at {}'.format(obj, self.pos)
 
     def set_node_options(self, options):
         """Update Shape class options."""
@@ -362,7 +470,7 @@ class Listbox(Shape):
         print('Listbox callback', self, self.id)
 
 
-class Window:
+class Window(Node):
     """Create a window for the app."""
     node_options = dict(pos=np.array((20, 20)),
                         size=np.array((100, 20)),
@@ -373,8 +481,8 @@ class Window:
                         cmd=None)
 
     def __init__(self, win=None, img=None):
-        App.wins.append(self)
-        App.win = self
+        super().__init__(App.root)  # Create child of app
+        App.win = self  # Make it active window
 
         Shape.options = Window.node_options.copy()
         self.children = []  # children
@@ -408,7 +516,7 @@ class Window:
         cv.setMouseCallback(win, self.mouse)
 
     def __str__(self):
-        return 'Window: ' + self.win
+        return 'Window(n{})'.format(self.id)
 
     def mouse(self, event, x, y, flags, param):
         pos = np.array((x, y))
@@ -509,7 +617,7 @@ class Window:
         cv.displayStatusBar(self.win, msg, 1000)
 
 
-class App:
+class App(Node):
     """Create the app class."""
     wins = []
     win = None
@@ -517,7 +625,10 @@ class App:
     options = dict(win_color=BLACK, obj_color=YELLOW, sel_color=BLUE)
 
     def __init__(self):
-        # cv.namedWindow('window0')
+        """Create the app singleton."""
+        App.root = super().__init__()  # Create the root node
+        print(App.root)
+        
         self.shortcuts = {'h': help,
                           'i': self.inspect,
                           'w': Window,
@@ -532,6 +643,7 @@ class App:
         self.new = Marker
 
     def run(self):
+        """Run the app event loop."""
         while True:
             key = cv.waitKey(0)
             if key >= 0:
@@ -540,10 +652,12 @@ class App:
                     self.key(k)
 
     def key(self, k):
+        """Handle an app key press."""
         if k in self.shortcuts:
             self.shortcuts[k]()
 
     def inspect(self):
+        """Print app info to the console."""
         print('--- INSPECT ---')
         print('App.wins', App.wins)
         # print('App.win', App.win)
@@ -563,5 +677,5 @@ class App:
 
 if __name__ == '__main__':
     app = App()
-    Winwdow()   
+    Window()   
     app.run()
