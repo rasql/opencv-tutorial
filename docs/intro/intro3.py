@@ -1,23 +1,14 @@
-"""Catch mouse events and write to overlay and statusbar."""
+"""Catch mouse events and write to statusbar."""
 import cv2 as cv
-
-def trackbar(x):
-    """Trackbar callback function."""
-    text = 'Trackbar: {}'.format(x)
-    cv.displayOverlay('image', text, 1000)
-    cv.imshow('image', img)
 
 def mouse(event, x, y, flags, param):
     """Mouse callback function."""
-    text = 'mouse at ({}, {})'.format(x, y)
-    cv.displayOverlay('image', 'Overlay: ' + text, 1000)
-    cv.displayStatusBar('image', 'Statusbar: ' + text, 1000)
+    text = f'mouse at ({x}, {y}), flags={flags}, param={param}'
+    cv.displayOverlay('window', 'Overlay: ' + text, 1000)
 
-img = cv.imread('messi.jpg', cv.IMREAD_COLOR)
-cv.imshow('image', img)
-
-cv.setMouseCallback('image', mouse)
-cv.createTrackbar('x', 'image', 100, 255, trackbar)
+img = cv.imread('messi.jpg')
+cv.imshow('window', img)
+cv.setMouseCallback('window', mouse)
 
 cv.waitKey(0)
 cv.destroyAllWindows()

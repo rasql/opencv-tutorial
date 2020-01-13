@@ -10,9 +10,9 @@ class Window:
 
 class App:
     def __init__(self):
-        img = cv.imread('messi.jpg', cv.IMREAD_GRAYSCALE)
+        img = cv.imread('messi.jpg')
         Window('image', img)
-
+        
     def run(self):
         """Run the main event loop."""
         k=0

@@ -1,31 +1,26 @@
-"""Display different markers."""
-from cvlib import *
+import cv2 as cv
+import numpy as np
 
-markers = ( cv.MARKER_CROSS,
-            cv.MARKER_DIAMOND,
-            cv.MARKER_SQUARE,
-            cv.MARKER_STAR,
-            cv.MARKER_TILTED_CROSS,
-            cv.MARKER_TRIANGLE_DOWN,
-            cv.MARKER_TRIANGLE_UP)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
-class Demo(App):
-    def __init__(self):
-        super(Demo, self).__init__()
-    
-        Window('window')
+RED = (0, 0, 255)
+GREEN = (0, 255, 0)
+BLUE = (255, 0, 0)
 
-        x, y = 50, 50
-        for m in markers:
-            Marker((x, y), markerType=m)
-            x += 50
+CYAN = (255, 255, 0)
+MAGENTA = (255, 0, 255)
+YELLOW = (0, 255, 255)
 
-        x, y = 50, 100
-        for m in markers:
-            Marker((x, y), markerType=m, thickness=3)
-            x += 50
+p0 = 100, 10
+p1 = 200, 90
+p2 = 300, 20    
+p3 = 500, 80
 
-        App.win.draw()
+img = img = np.zeros((100, 600, 3), np.uint8)
+cv.rectangle(img, p0, p1, BLUE, 2)
+cv.rectangle(img, p2, p3, GREEN, cv.FILLED)
+cv.imshow('RGB', img)
 
-if __name__ == '__main__':
-    Demo().run()
+cv.waitKey(0)
+cv.destroyAllWindows()

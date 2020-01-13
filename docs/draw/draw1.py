@@ -1,37 +1,11 @@
-"""Display instances of the Object class."""
-from cvlib import *
+import cv2 as cv
+import numpy as np
 
-class Demo(App):
-    def __init__(self):
-        super(Demo, self).__init__()
-                
-        img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
-        win = Window('window', img)
+img = img = np.zeros((100, 600, 3), np.uint8)
+cv.imshow('RGB', img)
 
-        Object()
-        Object()
-        Object(size=(140, 60))
-        Object()
+gray_img = np.zeros((100, 600), np.uint8)
+cv.imshow('Gray', gray_img)
 
-        Object(pos=(200, 50))
-        Object()
-        Object(size=(50, 50), dir=(1, 0))
-        Object()
-        Object()
-        Object()
-        
-        Window('win2', img)
-        Object()
-        Object()
-        Object(size=(140, 60))
-        Object()
-
-        Object(pos=(200, 50))
-        Object()
-        Object(dir=(1, 0))
-        Object()
-
-        App.win.draw()
-
-if __name__ == '__main__':
-    Demo().run()
+cv.waitKey(0)
+cv.destroyAllWindows()

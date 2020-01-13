@@ -11,6 +11,7 @@ Welcome to the OpenCV tutorial
    :caption: Contents:
 
    intro/intro
+   draw/draw
    app/app
    node/node
    shape/shape

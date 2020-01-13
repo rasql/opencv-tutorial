@@ -1,26 +1,14 @@
-"""Add graphics objects to current window."""
-from cvlib import *
+import cv2 as cv
+import numpy as np
 
-L = ['Rectangle', 'Line', 'Ellipse', 'Polygon', 'Circle', 'Text']
+BLUE = (255, 0, 0)
+center = 200, 50
+axes = 100, 30
+angle = 15
 
-class Demo(App):
-    def __init__(self):
-        super(Demo, self).__init__()
-        img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
+img = img = np.zeros((100, 600, 3), np.uint8)
+cv.ellipse(img, center, axes, angle, 0, 360, BLUE, 2)
+cv.imshow('RGB', img)
 
-        win = Window('window', img)
-        Arrow((50, 50), (250, 50))
-        Line((50, 100), (250, 150), thickness=3)
-        Marker((50, 150))
-        Marker((100, 150), markerType=cv.MARKER_DIAMOND, thickness=2)
-        
-        Rectangle((50, 200), (250, 250), thickness=-1)
-        Rectangle((50, 200), (250, 250), thickness=3, color=YELLOW)
-        
-        Circle((100, 250), 50, thickness=-1)
-        Circle((100, 250), 50, thickness=5, color=RED)
-        
-        win.draw()
-
-if __name__ == '__main__':
-    Demo().run()
+cv.waitKey(0)
+cv.destroyAllWindows()

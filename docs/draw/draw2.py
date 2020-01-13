@@ -1,22 +1,30 @@
-"""Display instances of the Arrow class."""
-from cvlib import *
+import cv2 as cv
+import numpy as np
 
-class Demo(App):
-    def __init__(self):
-        super(Demo, self).__init__()
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
-        Window()
-        x, y = 30, 30
-        for d in (1, 2, 5, 10):
-            Arrow((x, y), (x+200, y), thickness=d)
-            y += 40
+RED = (0, 0, 255)
+GREEN = (0, 255, 0)
+BLUE = (255, 0, 0)
 
-        x, y = 250, 30
-        for d in (50, 100, 200, 300):
-            Arrow((x, y), (x+d, y), thickness=2, color=GREEN)
-            y += 40
+CYAN = (255, 255, 0)
+MAGENTA = (255, 0, 255)
+YELLOW = (0, 255, 255)
 
-        App.win.draw()
+p0 = 10, 10
+p1 = 300, 90
+p2 = 500, 10
 
-if __name__ == '__main__':
-    Demo().run()
+img = img = np.zeros((100, 600, 3), np.uint8)
+cv.line(img, p0, p1, RED, 2)
+cv.line(img, p1, p2, YELLOW, 5)
+cv.imshow('RGB', img)
+
+gray_img = np.zeros((100, 600), np.uint8)
+cv.line(gray_img, p0, p1, 100, 2)
+cv.line(gray_img, p1, p2, 255,5)
+cv.imshow('Gray', gray_img)
+
+cv.waitKey(0)
+cv.destroyAllWindows()

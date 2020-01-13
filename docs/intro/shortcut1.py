@@ -13,8 +13,8 @@ class Demo(App):
         self.shortcuts = shortcuts
 
         img = cv.imread('intro/messi.jpg', cv.IMREAD_COLOR)
-        Window('image', img)
-        Window('image2', img)
+        Window('window', img)
+        Window('window2', img)
         Window()
 
 if __name__ == '__main__':
