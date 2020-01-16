@@ -272,8 +272,24 @@ If the line thickness is negative or ``cv.FILLED`` the rectangle is filled::
 
 :download:`rect1.py<rect1.py>`
 
-Draw a rectangle with the mouse
--------------------------------
+Draw multiple rectangles
+------------------------
+
+Now we combine thickness and color trackbar as welle as the mouse callback to 
+create multple rectangles.
+
+.. image:: rect2.png
+
+.. literalinclude:: rect2.py
+
+:download:`rect2.py<rect2.py>`
+
+The common code such as color definitions and image creation has been placed
+in a separate file.
+
+.. literalinclude:: draw.py
+
+:download:`draw.py<draw.py>`
 
 Draw an ellipse
 ---------------
@@ -296,6 +312,66 @@ The function ``cv.ellipes()`` adds an ellipse to an image::
 .. literalinclude:: draw4.py
 
 :download:`draw4.py<draw4.py>`
+
+Draw a polygon
+--------------
+
+The ``polylines`` function expects a Numpy array for the point list::
+
+    pts = [(50, 50), (300, 190), (400, 10)]
+    cv.polylines(img, np.array([pts]), True, RED, 5)
+
+.. image:: polygon1.png
+
+.. literalinclude:: polygon1.py
+
+:download:`polygon1.py<polygon1.py>`
+
+Draw a filled polygon
+--------------
+
+The ``polylines`` function expects a Numpy array for the point list::
+
+    pts = [(50, 50), (300, 190), (400, 10)]
+    cv.polylines(img, np.array([pts]), True, RED, 5)
+
+.. image:: polygon2.png
+
+.. literalinclude:: polygon2.py
+
+:download:`polygon2.py<polygon2.py>`
+
+Draw a polygon with the mouse
+-----------------------------
+
+Combining the previous techniques, it is rather simple to draw a polygon 
+just by clicking into the window. First we define an empty list::
+
+    pts = []
+
+Each time we click with the mouse we append a point::
+
+    def mouse(event, x, y, flags, param):
+        if event == cv.EVENT_LBUTTONDOWN:
+            pts.append((x, y))
+            draw(0)
+
+
+.. image:: polygon3.png
+
+.. literalinclude:: polygon3.py
+
+:download:`polygon3.py<polygon3.py>`
+
+Draw text
+---------
+
+.. image:: text1.png
+
+.. literalinclude:: text1.py
+
+:download:`text1.py<text1.py>`
+
 
 Reference:
 https://docs.opencv.org/4.2.0/d6/d6e/group__imgproc__draw.html

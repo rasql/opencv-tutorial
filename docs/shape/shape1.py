@@ -1,4 +1,4 @@
-"""Add show the different markers."""
+"""Show the different markers."""
 from cvlib import *
 
 class Demo(App):

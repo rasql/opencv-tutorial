@@ -1,4 +1,5 @@
 import numpy as np
+import cv2 as cv
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -12,15 +13,8 @@ MAGENTA = (255, 0, 255)
 YELLOW = (0, 255, 255)
 
 colors = (RED, GREEN, BLUE, MAGENTA, CYAN, YELLOW, WHITE)
+p0 = p1 = 0, 0
 
-p0 = 0, 0
-p1 = 0, 0
-d = 1
-color = WHITE
 img0 = np.zeros((200, 500, 3), np.uint8)
-
-# Trackbar callback functions
-def trackbar(x):
-    return
-
-    color = colors[x]
+img = img0.copy()
+cv.imshow('window', img)
