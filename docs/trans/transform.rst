@@ -63,3 +63,8 @@ Horizontally or vertically.
 
 :download:`transform4.py<transform4.py>`
 
+Cropping
+--------
+
+
+

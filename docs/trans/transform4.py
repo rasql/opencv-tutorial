@@ -1,7 +1,7 @@
 """Flip an image horizontally and vertically using keys."""
 import cv2 as cv
 
-img = cv.imread('../intro/messi.jpg')
+img = cv.imread('fish.jpg')
 cv.imshow('window', img)
 
 while True:

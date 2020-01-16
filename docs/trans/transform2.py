@@ -6,7 +6,7 @@ def trackbar(angle):
     rotated = cv.warpAffine(img, M, (w, h))
     cv.imshow('window', rotated)
 
-img = cv.imread('../intro/messi.jpg')
+img = cv.imread('fish.jpg')
 h, w = img.shape[:2]
 center = w//2, h//2
 

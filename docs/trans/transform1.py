@@ -8,7 +8,7 @@ def mouse(event, x, y, flags, param):
         shifted = cv.warpAffine(img, M, (w, h))
         cv.imshow('window', shifted)
 
-img = cv.imread('../intro/messi.jpg')
+img = cv.imread('fish.jpg')
 h, w = img.shape[:2]
 cv.imshow('window', img)
 cv.setMouseCallback('window', mouse)
