@@ -16,13 +16,13 @@ def cb(event, x, y, flags, param):
     str = '({}, {})'.format(x, y)
     cv.putText(img, str, (x, y), font, 1, YELLOW, 2, cv.LINE_AA)
 
-    cv.imshow('image', img)
+    cv.imshow('window, img)
 
 img0 = np.zeros((h, w, 3), np.uint8)
 font = cv.FONT_HERSHEY_SIMPLEX
-cv.namedWindow('image')
-cv.setMouseCallback('image', cb)
-cv.imshow('image',img0)
+cv.namedWindow('window)
+cv.setMouseCallback('window, cb)
+cv.imshow('window,img0)
 
 cv.waitKey(0)
 cv.destroyAllWindows()

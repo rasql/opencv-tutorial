@@ -6,7 +6,7 @@ center = 200, 50
 axes = 100, 30
 angle = 15
 
-img = img = np.zeros((100, 600, 3), np.uint8)
+img = img = np.zeros((100, 500, 3), np.uint8)
 cv.ellipse(img, center, axes, angle, 0, 360, BLUE, 2)
 cv.imshow('RGB', img)
 

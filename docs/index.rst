@@ -13,6 +13,7 @@ Welcome to the OpenCV tutorial
    intro/intro
    draw/draw
    trans/transform
+   histogram/histogram
    app/app
    node/node
    shape/shape

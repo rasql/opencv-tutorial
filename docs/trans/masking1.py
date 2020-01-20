@@ -1,15 +1,14 @@
-"""Add and subtract"""
+"""Masking."""
 import cv2 as cv
 import numpy as np
 
 img = cv.imread('fish.jpg')
 img = cv.resize(img, None, fx=0.5, fy=0.5, interpolation=cv.INTER_CUBIC)
-M = np.ones(img.shape, dtype='uint8') * 40
+mask = np.zeros(img.shape[:2], dtype='uint8')
+cv.circle(mask, (60, 50), 50, 255, -1)
 
-brighter = cv.add(img, M)
-darker = cv.subtract(img, M)
-
-img2 = np.hstack([img, brighter, darker])
+masked = cv.bitwise_and(img, img, mask=mask)
+img2 = np.hstack([img, masked])
 
 cv.imshow('window', img2)
 cv.waitKey(0)

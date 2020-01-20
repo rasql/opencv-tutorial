@@ -15,9 +15,12 @@ The first row of the matrix is [1, 0, x], the second is [0, 1, y]
 
 .. image:: transform1.png
 
+:download:`fish.jpg<fish.jpg>`
+
 .. literalinclude:: transform1.py
 
 :download:`transform1.py<transform1.py>`
+
 
 Rotation
 --------
@@ -41,6 +44,7 @@ It takes three arguments:
 
 :download:`transform2.py<transform2.py>`
 
+
 Scale
 ------
 
@@ -52,10 +56,11 @@ Scaling an image is to change its dimension.
 
 :download:`transform3.py<transform3.py>`
 
+
 Flipping
 --------
 
-Horizontally or vertically.
+Horizontally or vertically using a key.
 
 .. image:: transform4.png
 
@@ -63,8 +68,118 @@ Horizontally or vertically.
 
 :download:`transform4.py<transform4.py>`
 
-Cropping
---------
+
+Image artithmetic
+-----------------
+
+The operation ``add`` and ``subtract`` allow to add two images. 
+The ``add`` function is limited to 255. 
+The ``subtract`` function is limit to 0. 
+In the example below we add or subtract the value (40, 40, 40) to each pixel.
+As a result, the image becomes brighter or darker.
+
+.. image:: transform5.png
+
+.. literalinclude:: transform5.py
+
+:download:`transform5.py<transform5.py>`
 
 
+Bitwise operations
+------------------
+
+Bitwise operations act on grayscale images. 
+Most often it is used on black and white images.
+We start wtih a circle and a square shape and calculate this three bitwise operations:
+
+* and
+* or
+* xor (exclusive or)
+
+.. image:: bitwise.png
+
+.. literalinclude:: bitwise.py
+
+:download:`bitwise.py<bitwise.py>`
+
+
+Masking
+-------
+
+We can use a mask to extract only a certain part of an image.
+
+.. image:: masking1.png
+
+.. literalinclude:: masking1.py
+
+:download:`masking1.py<masking1.py>`
+
+
+Splitting channels
+------------------
+
+We can split an RGB image into it's components.
+Let's use an image which contains the three base colors.
+
+.. image:: lego.png
+
+:download:`lego.png<lego.png>`
+
+We find each color component in the separate channel Blue-Green-Red.
+
+.. image:: splitting1.png
+
+.. literalinclude:: splitting1.py
+
+:download:`splitting1.py<splitting1.py>`
+
+
+Merging channels
+----------------
+
+We can merge channels.
+
+.. image:: splitting2.png
+
+.. literalinclude:: splitting2.py
+
+:download:`splitting2.py<splitting2.py>`
+
+A different and faster way of keeping only one color channel and 
+setting the others to zero is to act directly on the Numpy array using slice indexing.
+
+.. literalinclude:: splitting3.py
+
+:download:`splitting3.py<splitting3.py>`
+
+
+
+Color spaces
+------------
+
+So far we have seen the RGB color space.
+However there are many other spaces.
+
+The example below shows:
+
+* HSV (Hue-Saturation-Value)
+* L*a*b
+
+.. image:: transform7.png
+
+.. literalinclude:: transform7.py
+
+:download:`transform7.py<transform7.py>`
+
+
+Affine transformation
+---------------------
+
+Here we use the mouse to rotate and scale.
+
+.. image:: affine1.png
+
+.. literalinclude:: affine1.py
+
+:download:`affine1.py<affine1.py>`
 

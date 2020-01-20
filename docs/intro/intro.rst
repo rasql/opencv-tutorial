@@ -126,7 +126,7 @@ This is the fonction::
 The overlay text is white on black background, centered and can be displayed 
 on multiple lines::
 
-    cv.displayOverlay('image', 'line 1\nline 2\nline 3')
+    cv.displayOverlay('window, 'line 1\nline 2\nline 3')
 
 .. literalinclude:: overlay.py
 
@@ -174,7 +174,7 @@ The ``createTrackbar`` command adds a trackbar below the main image.
 It goes from 0 to 255 and we set the initial value to 100. 
 When the trackbar is moved, it calls a callback function named ``trackbar``::
 
-    cv.createTrackbar('x', 'image', 100, 255, trackbar)
+    cv.createTrackbar('x', 'window, 100, 255, trackbar)
 
 The callback function ``trackbar`` displays the trackbar position in the overlay 
 region on getTrackbarPosof the window::
@@ -182,8 +182,8 @@ region on getTrackbarPosof the window::
     def trackbar(x):
         """Trackbar callback function."""
         text = f'Trackbar: {x}'
-        cv.displayOverlay('image', text, 1000)
-        cv.imshow('image', img)
+        cv.displayOverlay('window, text, 1000)
+        cv.imshow('window, img)
 
 The function ``cv.imshow`` is used to force an update of the window.
 
@@ -223,14 +223,14 @@ Catch mouse events
 
 The ``setMouseCallback`` function attaches a mouse callback function to the *image* window::
 
-    cv.setMouseCallback('image', mouse)
+    cv.setMouseCallback('window, mouse)
 
 This is the callback definition::
 
     def mouse(event, x, y, flags, param):
         """Mouse callback function."""
         text = f'mouse at ({x}, {y}), flags={flags}, param={param}'
-        cv.displayStatusBar('image', 'Statusbar: ' + text, 1000)
+        cv.displayStatusBar('window, 'Statusbar: ' + text, 1000)
 
 .. literalinclude:: intro3.py
    :caption: Here is the complete code.
