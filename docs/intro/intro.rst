@@ -182,8 +182,8 @@ region on getTrackbarPosof the window::
     def trackbar(x):
         """Trackbar callback function."""
         text = f'Trackbar: {x}'
-        cv.displayOverlay('window, text, 1000)
-        cv.imshow('window, img)
+        cv.displayOverlay('window', text, 1000)
+        cv.imshow('window', img)
 
 The function ``cv.imshow`` is used to force an update of the window.
 

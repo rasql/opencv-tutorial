@@ -12,9 +12,12 @@ Welcome to the OpenCV tutorial
 
    intro/intro
    draw/draw
+   color/color
    trans/transform
    histogram/histogram
+   img_proc/filters
    app/app
+   face/face
    node/node
    shape/shape
    widget/widget
