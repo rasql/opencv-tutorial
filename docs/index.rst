@@ -18,6 +18,7 @@ Welcome to the OpenCV tutorial
    img_proc/filters
    app/app
    face/face
+   yolo/yolo
    node/node
    shape/shape
    widget/widget
