@@ -38,7 +38,7 @@ You can print them to the console with::
     ln = net.getLayerNames()
     print(len(ln), ln)
 
-The 524 elements consist of convolutional layers (``conv``), 
+The 254 elements consist of convolutional layers (``conv``), 
 rectifier linear units (``relu``) etc.::
 
     254 ['conv_0', 'bn_0', 'relu_0', 'conv_1', 'bn_1', 'relu_1', 'conv_2', 'bn_2',
