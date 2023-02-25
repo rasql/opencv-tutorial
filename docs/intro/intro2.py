@@ -6,6 +6,8 @@ cap = cv.VideoCapture(0)
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
+    if not ret:
+        break
 
     # Our operations on the frame come here
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
