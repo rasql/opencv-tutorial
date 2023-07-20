@@ -119,7 +119,7 @@ Add an overlay
 --------------
 
 An overlay can be added to a window to add a line of text during a certain time delay.
-This is the fonction::
+This is the function::
 
     cv.displayOverlay(window, text, delay=0)
 
