@@ -1,10 +1,12 @@
 Histograms
 ==========
 
-Histograms are
+A histogram is a graphical representation of the intensity distribution of pixels in an image. It provides valuable insight into the image's tonal range, color balance, and contrast.
 
 Grayscale histogram
 -------------------
+
+For grayscale images, each pixel intensity value ranges from 0 (black) to 255 (white). The histogram shows the number of pixels for each intensity value.
 
 The ``calcHist`` function takes these arguments::
 
