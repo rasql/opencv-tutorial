@@ -38,7 +38,7 @@ You can print them to the console with::
     ln = net.getLayerNames()
     print(len(ln), ln)
 
-The 524 elements consist of convolutional layers (``conv``), 
+The 254 elements consist of convolutional layers (``conv``), 
 rectifier linear units (``relu``) etc.::
 
     254 ['conv_0', 'bn_0', 'relu_0', 'conv_1', 'bn_1', 'relu_1', 'conv_2', 'bn_2',
@@ -62,7 +62,7 @@ It has the following parameters:
 * the **scale** factor (1/255 to scale the pixel values to [0..1])
 * the **size**, here a 416x416 square image
 * the **mean** value (default=0)
-* the option **swapBR=True** (since OpenCV uses BGR)
+* the option **swapRB=True** (since OpenCV uses BGR)
 
 A blob is a 4D numpy array object (images, channels, width, height).
 The image below shows the red channel of the blob.
