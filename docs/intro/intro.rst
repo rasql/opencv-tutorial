@@ -95,6 +95,8 @@ and then loop back. The loop finishes when **q** is pressed::
     while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
+        if not ret:
+            break
 
         # Our operations on the frame come here
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
